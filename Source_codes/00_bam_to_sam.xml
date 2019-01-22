@@ -1,0 +1,28 @@
+<tool id="BAM-to-SAM" name="BAM-to-SAM" version="17.09">
+  <description></description>
+  <command>
+	/home/chenzhuod/galaxy/tools/CAFU/samtools-1.8/samtools view -h ${bam_file} > ${sam_file}
+  </command>
+  <inputs>
+      <param name="bam_file" type="data" label="Convert this dataset"/>
+  </inputs>
+  	  	<stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Running BAM-to-SAM" />
+    </stdio>
+  <outputs>
+	  <data name="sam_file" label="BAM files" />
+  </outputs>
+    	<help>
+.. class:: infomark
+
+**What it does**
+
+This tool converts data from BAM format to SAM format.
+		
+.. class:: infomark			
+			
+**Citation**
+ * Li H, Handsaker B, Wysoker A et al. The sequence alignment/map format and SAMtools. Bioinformatics 2009;25:2078-2079.
+
+    </help>
+</tool>
