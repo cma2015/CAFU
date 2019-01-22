@@ -31,7 +31,7 @@
 
 - For users who installed [Git](https:/gist.github.com/derhuerst/1b15ff4652a867391f03), the following command can be used to download CAFU project to local device.
   ```bash
-  git clone https:/github.com/cma2015/CAFU.git
+  git clone https://github.com/cma2015/CAFU.git
   ```
 #### Upload regular file
 - Click **Get Data** in the homepage (see figure below) of CAFU to upload files.
