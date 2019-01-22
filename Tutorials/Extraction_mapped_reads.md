@@ -14,7 +14,7 @@
         <td>Quality examination reports (html)</td>
         <td>Main output files</td>
         <td>FastQC (https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)</td>
-        <td>[1]</td>
+        <td>Andrews et al., 2010</td>
    </tr>
     <tr>
         <td rowspan="2">Trim Raw Reads</td>
