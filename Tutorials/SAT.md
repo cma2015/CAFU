@@ -8,7 +8,7 @@
         <td font-weight:bold>References</td>
 </tr>
 <tr>
-        <td>SAT</td>
+        <td>Species Assignment of Transcripts</td>
         <td>Machine learning-based prediction of the original species of assembled transcripts</td>
         <td>CDSs of two species; Assembled transcripts</td>
         <td>SAT score</td>
