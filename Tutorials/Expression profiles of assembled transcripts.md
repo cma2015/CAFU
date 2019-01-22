@@ -29,10 +29,10 @@
         <td rowspan="2">All transcripts; High-quality RNA-seq data; Sample information</td>
         <td rowspan="2">DE analysis table; Diagnostic plot (Volcano plot; Venn-daragram )</td>
         <td>RSEM (version 1.3.0; https://deweylab.github.io/RSEM/) ; Bowtie2 (version 2.3.4.1; http://bowtie-bio.sourceforge.net/index.shtml)</td>
-        <td>[10, 11]</td>
+        <td>Li <I>et al</I>., 2011<Br/>Langmead <I>et al</I>., 2012</td>
 </tr>
 <tr>
-        <td>RSEM (version 1.3.0; https://deweylab.github.io/RSEM/) ; Bowtie2 (version 2.3.4.1; http://bowtie-bio.sourceforge.net/index.shtml)</td>
-        <td>[15]</td>
+        <td>EBSeq (version 3.7; https://bioconductor.org/packages/release/bioc/html/EBSeq.html)</td>
+        <td>Leng <I>et al</I>., 2013</td>
 </tr>
 </table>
