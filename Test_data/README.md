@@ -11,13 +11,13 @@
 This folder includes three demo of reference genomes (maize.fa.zip, Oryza.fa.zip, Sorghum.fa.zip) and an annotation of maize genomes (maize.gff3.zip).
 
 ### Transcripts
-This folder includes two well-annotated transcripts ("ref_trans.fasta", "ref_trans_1.fasta").
+This folder includes two well-annotated transcripts ("ref_trans.fasta.zip", "ref_trans_1.fasta.zip").
 
 ### SAT
 This folder includes four files of sequences (negative_cds.fa, negative_cds.fa_BG.fa, positive_cds.fa, positive_cds.fa_BG.fa, test_cds.fa).
 
 ### Others
-This folder includes seven files (Assembled_transcript.fasta, Assembled_transcript_expression, AS_test.gtf, Cont_seq.fasta, Differentially_expressed_transcript_expression, RNA-Seq_sample_information).
+This folder includes seven files (Assembled_transcript.fasta, Assembled_transcript_expression, AS_test.gtf.zip, Cont_seq.fasta, Differentially_expressed_transcript_expression, RNA-Seq_sample_information, Batch_information.zip).
 
 
 ### For each function:
@@ -33,7 +33,7 @@ This folder includes seven files (Assembled_transcript.fasta, Assembled_transcri
 
 - (3) Extract Unmapped Reads
 
-  The test data for this function include "maize.fa" from the folder "Genomes", and trimmed RNA-Seq data generated from the function "Trim Raw Reads".
+  The test data for this function include "maize.fa.zip" from the folder "Genomes", and trimmed RNA-Seq data generated from the function "Trim Raw Reads".
 
 - (4) Remove Contamination
 
@@ -67,14 +67,14 @@ This folder includes seven files (Assembled_transcript.fasta, Assembled_transcri
   The test data for this function are in the folder "SAT".
 
 - (11) Characterize Nucleic-acid-based Features
-  The test data for this function are "Assembled_transcript.fasta" from the folder "others", and a well-annotated transcripts (such as "ref_trans.fasta") from the folder "Transcripts".
+  The test data for this function are "Assembled_transcript.fasta" from the folder "others", and a well-annotated transcripts (such as "ref_trans.fasta.zip") from the folder "Transcripts".
 
 - (12) Characterize Amino-acid-based Features
   The test data for this function are the same as the function "Characterize Nucleic-acid Feature"
 
 - (13) Detect Alternative Splicing Events
   
-  This function needs the file "AS_test.gtf" in the folder "others".
+  This function needs the file "AS_test.gtf.zip" in the folder "others".
 
 - (14) Analysis of Condition Specificity
 
@@ -94,8 +94,8 @@ This folder includes seven files (Assembled_transcript.fasta, Assembled_transcri
 
 - (18) Extract Sequences
 
-  This function needs the file "maize.fa", "maize.gff3" and "Assembled_transcript.fasta" in the folder "Others" and a transcript ID list generated from "Analyze Differential Expression".
+  This function needs the file "maize.fa.zip", "maize.gff3.zip" and "Assembled_transcript.fasta" in the folder "Others" and a transcript ID list generated from "Analyze Differential Expression".
 
 - (19) Remove Batch Effect 
 
-  This function needs the file "Assembled_transcript_expression", and "Batch_information" in the folder "others".
+  This function needs the file "Assembled_transcript_expression", and "Batch_information.zip" in the folder "others".
