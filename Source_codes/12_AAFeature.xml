@@ -1,0 +1,226 @@
+<tool id="AAFeature" name="Characterize Amino-acid-based Features" version="17.09">
+  <description></description>
+  <command>
+	mkdir -p /home/chenzhuod/galaxy/database/files/SAT ;
+	
+	/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/CPC2-beta/bin/CPC2.py -i $novel_trans -o /home/chenzhuod/galaxy/database/files/SAT/novel_CPCRes ;
+	awk '$2>=100{ print $0 }' /home/chenzhuod/galaxy/database/files/SAT/novel_CPCRes | awk '$6>=0.5{ print $1 }'> /home/chenzhuod/galaxy/database/files/SAT/novel_coding_ID ;
+	/home/chenzhuod/galaxy/tools/CAFU/seqtk/seqtk subseq $novel_trans /home/chenzhuod/galaxy/database/files/SAT/novel_coding_ID > /home/chenzhuod/galaxy/database/files/SAT/novel_coding_sequence ;
+	
+	/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/CPC2-beta/bin/CPC2.py -i $ref_trans -o /home/chenzhuod/galaxy/database/files/SAT/ref_CPCRes ;
+	awk '$2>=100{ print $0 }' /home/chenzhuod/galaxy/database/files/SAT/ref_CPCRes | awk '$6>=0.5{ print $1 }'> /home/chenzhuod/galaxy/database/files/SAT/ref_coding_ID ;
+	/home/chenzhuod/galaxy/tools/CAFU/seqtk/seqtk subseq $ref_trans /home/chenzhuod/galaxy/database/files/SAT/ref_coding_ID > /home/chenzhuod/galaxy/database/files/SAT/ref_coding_sequence ;	
+	
+	Rscript /home/chenzhuod/galaxy/tools/CAFU/SAT/translate.R -input /home/chenzhuod/galaxy/database/files/SAT/novel_coding_sequence -out /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa ;
+	Rscript /home/chenzhuod/galaxy/tools/CAFU/SAT/translate.R -input /home/chenzhuod/galaxy/database/files/SAT/ref_coding_sequence -out /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa ;
+	
+	sed -i 's/*//g' /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa ;
+	sed -i 's/*//g' /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa ;
+
+	cd /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis ;
+
+	#if $AAFType.diff_feature == "Kmer"
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa Protein -method  Kmer -k 1 -out $novel_Kmer_1 ;
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa Protein -method  Kmer -k 1 -out $ref_Kmer_1 ;
+		
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa Protein -method  Kmer -k 2 -out $novel_Kmer_2 ;
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa Protein -method  Kmer -k 2 -out $ref_Kmer_2 ;
+		
+	#elif $AAFType.diff_feature == "DR"
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa Protein -method  DR -out $novel_DR ;
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa Protein -method DR -out $ref_DR ;
+		
+	#elif $AAFType.diff_feature == "AC"
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa Protein -method AC -out $novel_AC ;
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa Protein -method AC -out $ref_AC ;
+		
+	#elif $AAFType.diff_feature == "CC"
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa Protein -method CC -out $novel_CC ;
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa Protein -method CC -out $ref_CC ;
+		
+	#elif $AAFType.diff_feature == "ACC"
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa Protein -method ACC -out $novel_ACC ;
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa Protein -method ACC -out $ref_ACC ;
+	
+	#elif $AAFType.diff_feature == "PDT"
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa Protein -method PDT -out $novel_PDT ;
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa Protein -method PDT -out $ref_PDT ;
+		
+	#elif $AAFType.diff_feature == "PC-PseAAC"
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa Protein -method PC-PseAAC -out $novel_PC_PseAAC ;
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa Protein -method PC-PseAAC -out $ref_PC_PseAAC ;
+		
+	#elif $AAFType.diff_feature == "SC-PseAAC"
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/novel_protein.fa Protein -method SC-PseAAC -out $novel_SC_PseAAC ;
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/BioSeq-Analysis/feature.pyc /home/chenzhuod/galaxy/database/files/SAT/ref_protein.fa Protein -method SC-PseAAC -out $ref_SC_PseAAC ;
+		
+	#end if
+  </command>
+  <inputs>
+	<conditional name="AAFType">
+		  <param name="diff_feature" type="select" label="Amino acid feature type">
+			  <option value="Kmer" selected="true">K-mer</option>
+			  <option value="DR">Distance-based residue</option>
+			  <option value="AC">Autocovariance</option>
+			  <option value="CC">Cross-covariance</option>
+			  <option value="ACC">Auto-cross-covariance</option>
+			  <option value="PDT">Physicochemical distance transformation</option>
+			  <option value="PC-PseAAC">Parallel correlation pseudo amino acid composition</option>
+			  <option value="SC-PseAAC">Series correlation pseudo amino acid composition</option>
+		  </param>
+	  </conditional>
+	  <param name="novel_trans" type="data" format="fasta" label="De novo assembled transcripts"/>
+	  <param name="ref_trans" type="data" format="fasta" label="Reference transcript sequences"/> 
+  </inputs>
+  <stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Running extracting and comparison Amino Acid Feature" />
+  </stdio>
+  <outputs>
+	  <data name="novel_Kmer_1" format="txt" label="Assembled transcript K-mer (kmer=1)">
+			<filter>AAFType['diff_feature'] == "Kmer"</filter>
+      </data>
+	  <data name="ref_Kmer_1" format="txt" label="Reference transcript K-mer (kmer=1)">
+			<filter>AAFType['diff_feature'] == "Kmer"</filter>
+      </data>
+      
+      <data name="novel_Kmer_2" format="txt" label="Assembled transcript K-mer (kmer=2)">
+			<filter>AAFType['diff_feature'] == "Kmer"</filter>
+      </data>
+      <data name="ref_Kmer_2" format="txt" label="Reference transcript K-mer (kmer=2)">
+			<filter>AAFType['diff_feature'] == "Kmer"</filter>
+      </data>
+      
+      <data name="novel_DR" format="txt" label="Assembled transcript DR">
+			<filter>AAFType['diff_feature'] == "DR"</filter>
+      </data>
+      <data name="ref_DR" format="txt" label="Reference transcript DR">
+			<filter>AAFType['diff_feature'] == "DR"</filter>
+      </data>
+	  
+      <data name="novel_AC" format="txt" label="Assembled transcript AC">
+			<filter>AAFType['diff_feature'] == "AC"</filter>
+      </data>
+      <data name="ref_AC" format="txt" label="Reference transcript AC">
+			<filter>AAFType['diff_feature'] == "AC"</filter>
+      </data>
+	  
+	  <data name="novel_CC" format="txt" label="Assembled transcript CC">
+			<filter>AAFType['diff_feature'] == "CC"</filter>
+      </data>
+      <data name="ref_CC" format="txt" label="Reference transcript CC">
+			<filter>AAFType['diff_feature'] == "CC"</filter>
+      </data>
+	  
+      <data name="novel_ACC" format="txt" label="Assembled transcript ACC">
+			<filter>AAFType['diff_feature'] == "ACC"</filter>
+      </data>
+      <data name="ref_ACC" format="txt" label="Reference transcript ACC">
+			<filter>AAFType['diff_feature'] == "ACC"</filter>
+      </data>
+	 
+      <data name="novel_PDT" format="txt" label="Assembled transcript PDT">
+			<filter>AAFType['diff_feature'] == "PDT"</filter>
+      </data>
+      <data name="ref_PDT" format="txt" label="Reference transcript PDT">
+			<filter>AAFType['diff_feature'] == "PDT"</filter>
+      </data>
+	  
+      <data name="novel_PC_PseAAC" format="txt" label="Assembled transcript PC-PseAAC">
+			<filter>AAFType['diff_feature'] == "PC-PseAAC"</filter>
+      </data>
+      <data name="ref_PC_PseAAC" format="txt" label="Reference transcript PC-PseAAC">
+			<filter>AAFType['diff_feature'] == "PC-PseAAC"</filter>
+      </data>
+	  
+	  <data name="novel_SC_PseAAC" format="txt" label="Assembled transcript SC-PseAAC">
+			<filter>AAFType['diff_feature'] == "SC-PseAAC"</filter>
+      </data>
+      <data name="ref_SC_PseAAC" format="txt" label="Reference transcript SC-PseAAC">
+			<filter>AAFType['diff_feature'] == "SC-PseAAC"</filter>
+      </data>
+	  
+  </outputs>
+        <help>
+.. class:: infomark
+
+**What it does**
+		  
+This function allows users to characterize the amino-acid-based features implemented in BioSeq-Analysis (Liu *et al*., 2017) between assembled and reference transcripts.
+
+.. class:: infomark
+
+**Inputs**
+
+* **De novo assembled transcripts**: Assembled transcript sequences generated from the function **Assemble Unmapped Reads**. `Assembled transcript demo`_
+
+.. _Assembled transcript demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/assembled_transcript.fasta
+ 
+* **Reference transcript sequences**: The sequences of transcripts from the existing genome annotation. `Well-annotation transcript sequence demo`_
+
+.. _Well-annotation transcript sequence demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Transcripts/ref_trans.fasta.zip
+
+.. class:: infomark
+
+**Outputs**
+
+For Kmer
+ 
+* **Assembled transcript K-mer (k = 1)**: K-mer (k = 1) frequency of *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript K-mer (k = 1)**: K-mer (k = 1) frequency of transcripts from the existing genome annotation.
+ 
+* **Assembled transcript K-mer (k = 2)**: K-mer (k = 2) *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript K-mer (k = 2)**: K-mer (k = 2) frequency of transcripts from the existing genome annotation.
+ 
+For DR
+ 
+* **Assembled transcript DR**: Distance-based residues encoding of *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript DR**: Distance-based residues encoding of transcripts from the existing genome annotation.
+ 
+For AC
+ 
+* **Assembled transcript AC**: Auto-covariance encoding of *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript AC**: Auto-covariance encoding of transcripts from the existing genome annotation.
+ 
+For CC
+ 
+* **Assembled transcript CC**: Cross-covariance encoding of *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript CC**: Cross-covariance encoding of transcripts from the existing genome annotation.
+ 
+For ACC
+ 
+* **Assembled transcript ACC**: Auto-cross-covariance encoding of *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript ACC**: Auto-cross-covariance encoding of transcripts from the existing genome annotation.
+ 
+For PDT
+ 
+* **Assembled transcript PDT**: Physicochemical distance transformation of *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript PDT**: Physicochemical distance transformation of transcripts from the existing genome annotation.
+ 
+For PC-PseAAC
+ 
+* **Assembled transcript PC-PseAAC**: Parallel correlation pseudo amino acid composition of *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript PC-PseAAC**: Parallel correlation pseudo amino acid composition of transcripts from the existing genome annotation.
+
+For SC-PseAAC
+ 
+* **Assembled transcript SC-PseAAC**: Series correlation pseudo amino acid composition of *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript SC-PseAAC**: Series correlation pseudo amino acid composition of transcripts from the existing genome annotation.
+
+.. class:: infomark
+
+**Citation**
+
+* Liu B. BioSeq-Analysis: a platform for DNA, RNA and protein sequence analysis based on machine learning approaches. Brief Bioinform 2017. doi: 10.1093/bib/bbx165.
+
+ 
+    </help>  
+</tool>

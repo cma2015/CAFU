@@ -1,0 +1,59 @@
+<tool id="identify_AS" name="Detect Alternative Splicing Events" version="17.09">
+  <description></description>
+  <command>
+	  
+	  mkdir -p /home/chenzhuod/galaxy/database/files/AS;
+	  
+	  cat $GFF_file > /home/chenzhuod/galaxy/database/files/AS/AS.gtf ;
+	  
+	  Rscript /home/chenzhuod/galaxy/tools/CAFU/13_AS.R --input2 $GFF_file --input3 $CPU --output1 $AS_events --output2 $read_counts;
+  </command>
+  <inputs>
+      <param name="GFF_file" type="data" label="GTF file of all transcripts"/>
+      <param name="CPU" type="integer" value="3" label="Threads"/>
+  </inputs>
+  	<stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Running Identify Alternative Splicing" />
+    </stdio>
+  <outputs>
+	  <data name="AS_events" format="txt" label="Alternative splicing results" />
+	  <data name="read_counts" format="txt" label="Read counts of all genome features in GTF file" />
+	  
+  </outputs>
+    	<help>
+.. class:: infomark
+
+**What it does**
+
+This function is used to detect alternative splicing events in assembled transcripts using an R package SGSeq (Goldstein *et al*., 2016).
+
+.. class:: infomark
+
+**Inputs**
+
+* **GTF file of all transcripts**: GTF file of all transcripts including assembled and reference transcripts. `GTF file demo`_
+
+.. _GTF file demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/AS_test.gtf.zip
+ 
+.. class:: infomark
+
+**Outputs**
+
+* **Alternative splicing results**: Alternative splicing events of all transcripts.
+ 
+* **Read counts of all genome features in GTF file**: Read counts supported for all genome features in GTF file provided by users.
+ 
+.. class:: infomark
+
+**Parameters**
+
+* **Threads**: Number of threads to use (3 in default).
+ 
+.. class:: infomark
+
+**Citation**
+
+* Goldstein LD, Cao Y, Pau G et al. Prediction and quantification of splice events from RNA-Seq data, PLoS One 2016;11:e0156132.
+
+    </help>
+</tool>

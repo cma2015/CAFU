@@ -1,0 +1,146 @@
+<tool id="trimFastQ" name="Trim Raw Reads" version="17.09">
+ 	<description></description>
+  <command><![CDATA[
+	  
+	  #if $readtype.single_or_paired == "single-end"
+		cat ${readtype.input_fq} | /home/chenzhuod/galaxy/tools/CAFU/fqtrim-0.9.7/fqtrim -l ${minlen} -B -p ${CPU} --outdir / -o ${fqtrimOutput_fq} - ;
+		java -jar /home/chenzhuod/galaxy/tools/CAFU/Trimmomatic-0.36/trimmomatic-0.36.jar SE -phred${phred} -threads ${CPU} ${fqtrimOutput_fq} ${TrimOutput_fq} LEADING:${Trimmomatic.leading} TRAILING:${Trimmomatic.trailing} SLIDINGWINDOW:${Trimmomatic.window_size}:${Trimmomatic.required_quality} MINLEN:${minlen} ;
+		
+	  #elif $readtype.single_or_paired == "paired-end"
+	    cat ${readtype.input_fq1} | /home/chenzhuod/galaxy/tools/CAFU/fqtrim-0.9.7/fqtrim -l ${minlen} -P${phred} -B -p ${CPU} --outdir / -o ${fqtrimOutput_fq1} - &&
+		cat ${readtype.input_fq2} | /home/chenzhuod/galaxy/tools/CAFU/fqtrim-0.9.7/fqtrim -l ${minlen} -P${phred} -B -p ${CPU} --outdir / -o ${fqtrimOutput_fq2} - ;
+		java -jar /home/chenzhuod/galaxy/tools/CAFU/Trimmomatic-0.36/trimmomatic-0.36.jar PE -phred${phred} -threads ${CPU} ${fqtrimOutput_fq1} ${fqtrimOutput_fq2} ${TrimOutput_paired_fq1} ${TrimOutput_unpaired_fq1} ${TrimOutput_paired_fq2} ${TrimOutput_unpaired_fq2} LEADING:${Trimmomatic.leading} TRAILING:${Trimmomatic.trailing} SLIDINGWINDOW:${Trimmomatic.window_size}:${Trimmomatic.required_quality} MINLEN:${minlen} ;
+	  #end if
+
+  ]]>
+  </command>
+
+  <inputs>
+	  <conditional name="readtype">
+
+		  <param name="single_or_paired" type="select" label="Single-end or paired-end reads?">
+			  <option value="single-end" selected="true">Single-end</option>
+			  <option value="paired-end">Paired-end</option>
+		  </param>
+		  <when value="single-end">
+			  <param name="input_fq" type="data" format="fastqsanger,fastqsanger.gz" label="Input FASTQ file" />
+		  </when>
+	      <when value="paired-end">
+			  <param name="input_fq1" format="fastqsanger,fastqsanger.gz" type="data" label="Input FASTQ file (R1 of pair)" />
+			  <param name="input_fq2" format="fastqsanger,fastqsanger.gz" type="data" label="Input FASTQ file (R2 of pair)" />			  
+	      </when>
+	  </conditional>
+
+      <param name="minlen" type="integer" value="20" min="0" label="Minimum length of reads to be kept"/>
+	  <param name="phred" type="integer" label="Quality scores" value="33"/>
+	  <param name="CPU" type="integer" label="Threads" value="3"/>
+	  
+
+      <section name="Trimmomatic" title="Trimmomatic parameters" expanded="True">
+	    <param name="window_size" type="integer" label="The number of bases to average across (SLIDINGWINDOW)" value="4"/>
+	    <param name="required_quality" type="integer" label="The average quality required (SLIDINGWINDOW)" value="20"/>
+	    <param name="leading" type="integer" label="Minimum quality required to keep a base (LEADING)" value="20"/>
+	    <param name="trailing" type="integer" label="Minimum quality required to keep a base (TRAILING)" value="20"/>
+      </section>	
+  </inputs>
+    <stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Running combine collection to a file" />
+  </stdio>
+  <outputs>
+	  <data name="fqtrimOutput_fq" hidden="TRUE"  label="fqtrim_${readtype.input_fq.name}" format="fastqsanger,fastqsanger.gz">
+		  <filter>readtype['single_or_paired'] == "single-end"</filter>
+	  </data>
+	  <data name="TrimOutput_fq" label="Trimmed_${readtype.input_fq.name}" format="fastqsanger,fastqsanger.gz">
+		  <filter>readtype['single_or_paired'] == "single-end"</filter>
+	  </data>
+
+	  <data name="fqtrimOutput_fq1" hidden="TRUE" label="fqtrim_${readtype.input_fq1.name}" format="fastqsanger,fastqsanger.gz">
+		  <filter>readtype['single_or_paired'] == "paired-end"</filter>
+	  </data>
+	  <data name="TrimOutput_paired_fq1" label="Trimmed_${readtype.input_fq1.name}" format="fastqsanger,fastqsanger.gz">
+		  <filter>readtype['single_or_paired'] == "paired-end"</filter>
+	  </data>
+	  <data name="TrimOutput_unpaired_fq1" hidden="TRUE" label="Trimmed_umpaired_${readtype.input_fq1.name}" format="fastqsanger,fastqsanger.gz">
+		  <filter>readtype['single_or_paired'] == "paired-end"</filter>
+	  </data>
+
+	  <data name="fqtrimOutput_fq2" hidden="TRUE" label="fqtrim_${readtype.input_fq2.name}" format="fastqsanger,fastqsanger.gz">
+		  <filter>readtype['single_or_paired'] == "paired-end"</filter>
+	  </data>
+	  <data name="TrimOutput_paired_fq2" label="Trimmed_${readtype.input_fq2.name}" format="fastqsanger,fastqsanger.gz">
+		  <filter>readtype['single_or_paired'] == "paired-end"</filter>
+	  </data>
+	  <data name="TrimOutput_unpaired_fq2" hidden="TRUE" label="Trimmed_umpaired_${readtype.input_fq2.name}" format="fastqsanger,fastqsanger.gz">
+		  <filter>readtype['single_or_paired'] == "paired-end"</filter>
+	  </data>
+  </outputs>
+  <help>
+.. class:: infomark
+
+**What it does**
+		  
+In this function, poly-A/T is firstly trimmmed using fqtrim (Pertea, 2015), and then high-quality reads (score > 20 in default) are extracted by Trimmomatic (Bolger *et al*., 2014). Reads shorter than 20bp (in default) are discarded.
+
+.. class:: infomark
+
+**Inputs**
+
+For single-end RNA-Seq data
+
+* **Input FASTQ file**: Raw RNA-Seq data with FASTQ format. `Single-end RNA-Seq demo`_
+
+.. _Single-end RNA-Seq demo: https://github.com/cma2015/CAFU/tree/master/Test_data/SE%20RNA-Seq
+
+For paired-end RNA-Seq data
+
+* **Input FASTQ file (R1 of pair)**, **Input FASTQ file (R2 of pair)**: Raw RNA-Seq data with FASTQ format. `Paired-end RNA-Seq demo`_
+
+.. _Paired-end RNA-Seq demo: https://github.com/cma2015/CAFU/tree/master/Test_data/PE%20RNA-Seq
+
+.. class:: infomark
+
+**Outputs**
+
+For single-end RNA-Seq data
+
+* **fqtrim_DATA_ID.fastq**: Poly-A/T trimmed RNA-Seq using fqtrim.
+
+* **Trimmed_DATA_ID.fastq**: High-quality RNA-Seq generated by Trimmomatic.
+
+For paired-end RNA-Seq data
+
+* **fqtrim_DATA_ID_1.fastq**, **fqtrim_DATA_ID_2.fastq**: Poly-A/T trimmed RNA-Seq using fqtrim.
+
+* **Trimmed_DATA_ID_1.fastq**, **Trimmed_DATA_ID_2.fastq**: High-quality RNA-Seq generated by Trimmomatic.
+
+* **Trimmed_umpaired_DATA_ID_1.fastq**, **Trimmed_umpaired_DATA_ID_2.fastq**: Unpaired RNA-Seq generated by Trimmomatic.
+
+.. class:: infomark
+
+**Parameters**
+
+* **Minimum length of reads to be kept**: Minimum length of reads to be kept (20bp in default).
+
+* **Quality scores**: RNA-Seq quality scores, phred33 or phread64 (33 in default).
+
+* **Threads**: Number of threads to use (3 in default).
+
+* **The number of bases to average across (SLIDINGWINDOW)**: Specifies the number of bases to average across (4 in default).
+
+* **The average quality required (SLIDINGWINDOW)**: Specifies the average quality required (20 in default).
+
+* **Minimum quality required to keep a base (LEADING)**: Bases at the start of the read with quality below the threshold will be removed (20 in default).
+
+* **Minimum quality required to keep a base (TRAILING)**: Bases at the end of the read with quality below the threshold will be removed (20 in default).
+
+.. class:: infomark
+
+**Citation**
+
+* Pertea G. Fqtrim: v0. 9.4 release. Zenodo, 2015. 10.5281/zenodo.20552.
+
+* Bolger AM, Lohse M, Usadel B. Trimmomatic: a flexible trimmer for Illumina sequence data. Bioinformatics 2014;30:2114-2120.
+   </help>
+
+
+</tool>

@@ -1,0 +1,85 @@
+<tool id="Quality_control" name="Quality Control" version="17.09">
+	<description></description>
+	<command><![CDATA[
+        #import re
+        #set input_name = re.sub('[^\w\-\s]', '_', str($input_file.element_identifier))
+        
+        #if $input_file.ext.endswith('.gz'):
+            #set input_file_sl = $input_name + '.gz'
+        #elif $input_file.ext.endswith('.bz2'):
+            #set input_file_sl = $input_name + '.bz2'
+        #else
+            #set input_file_sl = $input_name
+        #end if
+
+        #if 'bam' in $input_file.ext:
+            #set format = 'bam'
+        #elif 'sam' in $input_file.ext:
+            #set format = 'sam'
+        #else
+            #set format = 'fastq'
+        #end if
+
+        ln -s '${input_file}' '${input_file_sl}' &&
+        mkdir -p '${html_file.files_path}' &&
+        /home/chenzhuod/galaxy/tools/CAFU/FastQC/fastqc
+            --outdir '${html_file.files_path}'
+            
+            --quiet
+            --extract
+            -f '${format}'
+            '${input_file_sl}'
+
+        && cp '${html_file.files_path}'/*/fastqc_data.txt output.txt
+        && cp '${html_file.files_path}'/*\.html output.html
+
+    ]]></command>
+	<inputs>
+        <param format="fastq,fastq.gz,fastq.bz2,bam,sam" name="input_file" type="data"
+               label="Input FASTQ file" />
+    </inputs>
+    <outputs>
+        <data format="html" name="html_file" from_work_dir="output.html" label="${tool.name} on ${on_string}: Webpage" />
+        <data format="txt" name="text_file"  from_work_dir="output.txt" label="${tool.name} on ${on_string}: RawData" />
+    </outputs>
+          	<help>
+.. class:: infomark
+
+**What it does**
+
+This function implements FastQC (Andrews *et al*., 2010) to perform quality control of RNA-Seq data.
+
+.. class:: infomark
+
+**Inputs**
+
+* **Input FASTQ file**: Raw RNA-Seq data with FASTQ format. `RNA-Seq demo`_
+
+.. _RNA-Seq demo: https://github.com/cma2015/CAFU/tree/master/Test_data/SE%20RNA-Seq
+
+.. class:: infomark
+
+**Outputs**
+
+This function produces a basic text and a HTML output file that contain all of the results, including the following:
+
+* Basic Statistics
+* Per base sequence quality
+* Per sequence quality scores
+* Per base sequence content
+* Per sequence GC content
+* Per base N content
+* Sequence Length Distribution
+* Sequence Duplication Levels
+* Overrepresented sequences
+* Adapter Content
+
+.. class:: infomark
+
+**Citation**
+
+* Andrews S. FastQC: a quality control tool for high throughput sequence data 2010. Available online at: http://www.bioinformatics.babraham.ac.uk/projects/fastqc
+
+    </help>
+</tool>
+

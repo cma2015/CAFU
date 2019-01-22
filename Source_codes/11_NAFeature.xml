@@ -1,0 +1,89 @@
+<tool id="NAFeature" name="Characterize Nucleic-acid-based Features" version="17.09">
+  <description></description>
+  <command>
+	#if $NAFType.length_or_GC == "transcriptLength"
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/00_seq_len.py $novel_trans > $novel_len ;
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/00_seq_len.py $ref_trans > $ref_len ;
+		Rscript /home/chenzhuod/galaxy/tools/CAFU/10_length_distribution.R --input1 $novel_len --input2 $ref_len --output $plot_transcripts_length ;
+	#elif $NAFType.length_or_GC == "GCContent"
+		perl /home/chenzhuod/galaxy/tools/CAFU/10_calculate_GC_content.pl $novel_trans $novel_GC ;
+		perl /home/chenzhuod/galaxy/tools/CAFU/10_calculate_GC_content.pl $novel_trans $ref_GC ;
+		Rscript /home/chenzhuod/galaxy/tools/CAFU/10_GC_distribution.R --input1 $ref_GC --input2 $novel_GC --output $plot_GC_content ;
+	#end if
+  </command>
+  <inputs>
+	<conditional name="NAFType">
+		  <param name="length_or_GC" type="select" label="Nucleic acid feature type">
+			  <option value="transcriptLength" selected="true">Transcript length</option>
+			  <option value="GCContent">GC content</option>
+		  </param>
+	  </conditional>	
+	  <param name="novel_trans" type="data" format="fasta" label="De novo assembled transcripts"/>
+	  <param name="ref_trans" type="data" format="fasta" label="Reference transcript sequences"/>
+  </inputs>
+  <stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Running Characterize Nucleic-acid Feature" />
+  </stdio>
+  <outputs>
+	  <data name="novel_len" format="txt" label="Assembled transcript length">
+			<filter>NAFType['length_or_GC'] == "transcriptLength"</filter>
+      </data>
+      <data name="ref_len" format="txt" label="Reference transcript length">
+			<filter>NAFType['length_or_GC'] == "transcriptLength"</filter>
+      </data>
+      <data name="plot_transcripts_length" format="pdf" label="Length distribution comparison">
+			<filter>NAFType['length_or_GC'] == "transcriptLength"</filter>
+      </data>
+      <data name="novel_GC" format="txt" label="Assembled transcript GC content">
+			<filter>NAFType['length_or_GC'] == "GCContent"</filter>
+      </data>
+      <data name="ref_GC" format="txt" label="Reference transcript GC content">
+			<filter>NAFType['length_or_GC'] == "GCContent"</filter>
+      </data>
+      <data name="plot_GC_content" format="pdf" label="GC content distribution comparison">
+			<filter>NAFType['length_or_GC'] == "GCContent"</filter>
+      </data>
+  </outputs>
+          <help>
+.. class:: infomark
+
+**What it does**
+		  
+This function allows users to characterize the nucleic-acid-based features between assembled and reference transcripts in terms of transcript length and GC content.
+
+.. class:: infomark
+
+**Inputs**
+
+* **De novo assembled transcripts**: Assembled transcript sequences generated from the function **Assemble Unmapped Reads**. `Assembled transcript demo`_
+
+.. _Assembled transcript demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/assembled_transcript.fasta
+ 
+* **Reference transcript sequences**: The sequences of transcripts from the existing genome annotation. `Well-annotation transcript sequence demo`_
+
+.. _Well-annotation transcript sequence demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Transcripts/ref_trans.fasta.zip
+
+.. class:: infomark
+
+**Outputs**
+
+For transcript length
+
+* **Assembled transcript length**: Length of *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript length**: Length of transcripts from the existing genome annotation.
+ 
+* **Length distribution comparison**: Length distribution comparison between assembled transcripts and reference transcript.
+ 
+For GC content
+ 
+* **Assembled transcript GC content**: GC content of *de novo*-assembled transcripts generated from the function **Assemble Unmapped Reads**.
+ 
+* **Reference transcript GC content**: GC content of transcripts from the existing genome annotation.
+ 
+* **Length distribution comparison**: GC content distribution comparison between assembled transcripts and reference transcript.
+ 
+ 
+  </help>
+  
+</tool>

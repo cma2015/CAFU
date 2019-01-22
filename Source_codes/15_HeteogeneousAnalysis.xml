@@ -1,0 +1,44 @@
+<tool id="HeteogeneousAnalysis" name="Analyze Heterogeneous" version="17.09">
+  <description></description>
+  <command>
+	  Rscript /home/chenzhuod/galaxy/tools/CAFU/13_HeteogeneousAnalysis.R --input1 $expMat --output1 $transGC --output2 $transGCPlot;
+  </command>
+  <inputs>
+	<param name="expMat" type="data" label="Transcript expression abundance matrix" />
+  </inputs>
+  <stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Running Analyze Heterogeneous" />
+  </stdio>
+  <outputs>
+	  <data name="transGC" format="txt" label="Gini Coefficient of assembled transcripts" />
+	  <data name="transGCPlot" format="pdf" label="Plot of Gini coefficient of assembled transcripts" />
+  </outputs>
+  	<help>
+.. class:: infomark
+
+**What it does**
+		  
+This function examines the stability of each transcript using its expression values in all samples by the Gini index (coefficient) according to (O'Hagan *et al*., 2017).
+
+.. class:: infomark
+
+**Inputs**
+
+* **Transcript expression abundance matrix**: Expression abundance matrix with the rows as transcripts and the columns as samples. `Transcript expression abundance matrix demo`_
+
+.. _Transcript expression abundance matrix demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/assembled_transcript_expression
+
+.. class:: infomark
+
+**Outputs**
+
+* **Gini Coefficient of assembled transcripts**: A tab seperated matrix contains transcript ID, and corresponding Gini Coefficient.
+ 
+* **Plot of Gini coefficient of assembled transcripts**: Scatter diagram of Gini coefficient of each assembled transcript.
+ 
+**Citation**
+
+* O'Hagan S, Muelas MW, Day PJ et al. GeneGini: assessment via the Gini coefficient of reference “Housekeeping” genes and diverse human transporter expression profiles, Cell Systems 2018;6:230-244. e231 
+
+    </help>
+</tool>

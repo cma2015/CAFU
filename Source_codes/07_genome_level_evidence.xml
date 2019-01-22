@@ -1,0 +1,103 @@
+<tool id="genomeLevelEvidefnce" name="Genome-level Evidence" version="17.09">
+	<description></description>
+	<command>
+		mkdir -p /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/gmapdb;
+		mkdir -p /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/gmapRes;
+		
+		grep ">" $Sequences.assembly_transcritps | sed "s/>//g" > /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/transcripts_ID ;
+		
+		#for refSeq in $Sequences.refSeq_collection:
+			gmap_build -D /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/gmapdb -d ${refSeq.name} -k 15 $refSeq 2>1 1> RefSeq_output ;
+			gmap -D /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/gmapdb -d ${refSeq.name} -t $Parameters.CPU -n 0 -f psl $Sequences.assembly_transcritps 2> /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/gmapdb/${refSeq.name}_gmap_stderr1 > /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/gmapRes/${refSeq.name}_gmapRes.psl ;
+		#end for
+
+		Rscript /home/chenzhuod/galaxy/tools/CAFU/06_integrate_gmapRes_genome_level.R --output1 $gmapRes_integrated ;
+		Rscript /home/chenzhuod/galaxy/tools/CAFU/06_filter_transcript_genome_level.R --input1 $gmapRes_integrated --input2 $Parameters.minCoverage --input3 $Parameters.minIdentity --output1 $filteredTransInfo ; 
+		
+		grep -P "\tmRNA\t" $Sequences.all_genome_features_annotation > /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/all_gene_annotation ;
+
+		/usr/bin/python /home/chenzhuod/galaxy/tools/CAFU/06_extract_intron_gff3_from_gff3.py $Sequences.all_genome_features_annotation /home/chenzhuod/galaxy/database/files/all_annotation_tmp ;
+		grep -P "\tintron\t" /home/chenzhuod/galaxy/database/files/all_annotation_tmp_introns.gff3 > /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/all_intron_annotation ;	
+		
+		Rscript /home/chenzhuod/galaxy/tools/CAFU/06_get_same_species_best_alignment_filtered.R --input1 $Parameters.sameSpeciesRefID --input2 $Parameters.minCoverage --input3 $Parameters.minIdentity;
+		sed -i 's/ //g' /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/multiExonTransGmapRes.gff3 ;
+		/home/chenzhuod/galaxy/tools/CAFU/bedtools2/bin/bedtools intersect -wao -a /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/multiExonTransGmapRes.gff3 -b /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/all_gene_annotation > /home/chenzhuod/galaxy/database/files/Transcript_evidence/genome_level/multiExonTrans_refTrans_bedtools_intersectRes ;
+		Rscript /home/chenzhuod/galaxy/tools/CAFU/06_novel_transcripts_filter_the_same_species_genome.R --output1 $same_similar_transciript_ID --output2 $novel_transcript_ID ;
+	</command>
+	<inputs>
+		<section name="Sequences" title="Sequences and annotation" expanded="True">
+			<param name="refSeq_collection" type="data_collection" label="Reference genome sequences (as a collection)"/>
+			<param name="assembly_transcritps" type="data" label="De novo assembled transcripts"/>
+			<param name="all_genome_features_annotation" type="data" label="Genome feature annotation of the corresponding species"/>
+		</section>
+		<section name="Parameters" title="Genome-level evidence parameters" expanded="True">
+			<param name="CPU" type="integer" value="3" label="Threads"/>
+			<param name="sameSpeciesRefID" type="text" label="The corresponding species reference genome name"/>
+			<param name="minIdentity" type="float" value="0.95" label="Alignment identity threshold of a transcript"/>
+			<param name="minCoverage" type="float" value="0.95" label="Alignment coverage threshold of a transcript"/>
+		</section>
+	</inputs>
+	<stdio>
+		<exit_code range="1:"  level="fatal" description="Error Running Genome-level evidence" />
+	</stdio>
+	<outputs>
+		<data name="gmapRes_integrated" format="txt" label="Integrated GMAP results of newly assembled transcripts against all reference genome sequences"/>
+		<data name="filteredTransInfo" format="txt" label="Confitent transcript information"/>
+		<data name="same_similar_transciript_ID" format="txt" label="The same/similar-intron transcript ID"/>
+		<data name="novel_transcript_ID" format="txt" label="Novel transcript ID"/>
+	</outputs>
+	<help>
+.. class:: infomark
+
+**What it does**
+		  
+This function can be used to identify *de novo*-assembled transcripts missing from the existing genome annotation. All the assembled transcripts are aligned to the reference genome sequences of the species of interests using GMAP (Wu *et al*., 2005), and the best genomic matches with high identity (e.g., ≥ 95%) and coverage (e.g., ≥ 95%) are selected. Users can also eliminate assembled transcripts with no introns, which could represent either noise or pseudogenes.  
+
+.. class:: infomark
+
+**Inputs**
+
+* **Reference genome sequences (as a collection)**: A **collection** of reference genome sequences of the species of interest (input as a data collection). `Reference genome sequence demo`_
+
+.. _Reference genome sequence demo: https://github.com/cma2015/CAFU/tree/master/Test_data/Genomes
+ 
+* **De novo assembled transcripts**: Assembled transcript sequences generated from the function **Assemble Unmapped Reads**. `Assembled transcript demo`_
+
+.. _Assembled transcript demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/assembled_transcript.fasta
+ 
+* **Genome feature annotation of the corresponding species**: Genome annotation file of corresponding species with RNA-Seq samples. `Reference genome annotation demo`_
+
+.. _Reference genome annotation demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Genomes/maize.gff3.zip
+
+.. class:: infomark
+
+**Outputs**
+
+* **Integrated GMAP results of newly assembled transcripts against all reference genome sequences**: GMAP alignment results (coverage and identity) of each assembled transcript against all reference genome sequences.
+ 
+* **Confident transcript information**: Confident transcript information filtered by high coverage and identity.
+ 
+* **The same/similar-intron transcript ID**: Assembled transcript IDs which possess the same/similar intron with corresponding species reference transcripts.
+ 
+* **Novel transcript ID**: Novel transcripts missing from the existing genome annotation.
+ 
+.. class:: infomark
+
+**Parameters**
+
+* **Threads**: Number of threads to use (3 in default).
+ 
+* **The corresponding species reference genome name**: The name of corresponding species genome (For example, the reference genome file of corresponding species is "maize.fa", users should submit "maize").
+ 
+* **Alignment identity threshold of a transcript**: Identity threshold with mapped transcripts (0.95 in default).
+
+* **Alignment coverage threshold of a transcript**: Coverage threshold with mapped transcripts (0.95 in default).
+ 
+.. class:: infomark
+
+**Citation**
+ 
+* Wu TD, Watanabe CK. GMAP: a genomic mapping and alignment program for mRNA and EST sequences. Bioinformatics 2005;21:1859-1875.
+
+    </help>
+</tool>

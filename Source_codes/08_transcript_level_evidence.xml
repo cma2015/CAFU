@@ -1,0 +1,81 @@
+<tool id="transcript_level_evidence" name="Transcript-level Evidence" version="17.09">
+	<description></description>
+	<command>
+		mkdir -p /home/chenzhuod/galaxy/database/files/Transcript_evidence/transcript_level/gmapdb;
+		mkdir -p /home/chenzhuod/galaxy/database/files/Transcript_evidence/transcript_level/gmapRes;
+		grep ">" $Sequences.assembly_transcritps | sed "s/>//g" > /home/chenzhuod/galaxy/database/files/Transcript_evidence/transcript_level/transcripts_ID ;
+		
+		#for refSeq in $Sequences.refSeq_collection:
+			gmap_build -D /home/chenzhuod/galaxy/database/files/Transcript_evidence/transcript_level/gmapdb -d ${refSeq.name} -k 15 $refSeq 2>1 1> RefSeq_output ;
+			gmap -D /home/chenzhuod/galaxy/database/files/Transcript_evidence/transcript_level/gmapdb -d ${refSeq.name} -t $Parameters.CPU -n 0 -f psl $Sequences.assembly_transcritps 2> /home/chenzhuod/galaxy/database/files/Transcript_evidence/transcript_level/gmapdb/${refSeq.name}_gmap_stderr1 > /home/chenzhuod/galaxy/database/files/Transcript_evidence/transcript_level/gmapRes/${refSeq.name}_gmapRes.psl ;
+		#end for
+
+		Rscript /home/chenzhuod/galaxy/tools/CAFU/07_integrate_gmapRes_transcript_level.R --output1 $gmapRes_integrated ;
+		Rscript /home/chenzhuod/galaxy/tools/CAFU/07_filter_transcript_transcript_level.R --input1 $gmapRes_integrated --input2 $Parameters.minCoverage --input3 $Parameters.minIdentity --output1 $filteredTransInfo --output2 $filteredTransID;		
+	</command>
+	<inputs>
+		<section name="Sequences" title="Sequences" expanded="True">
+			<param name="refSeq_collection" type="data_collection" label="Well-annotated transcript sequences (as a collection)"/>
+			<param name="assembly_transcritps" type="data" label="De novo assembled transcripts"/>
+		</section>
+		<section name="Parameters" title="Transcript-level evidence parameters" expanded="True">
+			<param name="CPU" type="integer" value="3" label="Threads"/>
+			<param name="minIdentity" type="float" value="0.95" label="Alignment identity threshold of a transcript"/>
+			<param name="minCoverage" type="float" value="0.95" label="Alignment coverage threshold of a transcript"/>
+		</section>
+	</inputs>
+	<stdio>
+		<exit_code range="1:"  level="fatal" description="Error Running Transcript-level evidence" />
+	</stdio>
+	<outputs>
+		<data name="gmapRes_integrated" format="txt" label="Integrated GMAP results of newly assembled transcripts against all other transcript sequences"/>
+		<data name="filteredTransInfo" format="txt" label="Confitent transcript information"/>
+		<data name="filteredTransID" format="txt" label="Confitent transcript ID"/>
+    </outputs>
+		      <help>
+.. class:: infomark
+
+**What it does**
+		  
+This function can be used to filter *de novo*-assembled transcripts with high similarity comparing to other well-annotated transcripts, such as full-length transcripts generated from single-molecule real-time sequencing and/or high-quality transcripts annotated in closely related species. After aligning assembled transcripts with other well-annotated transcripts with GMAP (Wu *et al*., 2005), CAFU filters the transcripts with the best transcript alignments with high identity (e.g., ≥ 95%) and coverage (e.g., ≥ 95%). 
+
+.. class:: infomark
+
+**Inputs**
+
+* **Well-annotated transcript sequences (as a collection)**: A **collection** of reference sequence of well-annotated transcripts, such as full-length transcripts generated from single-molecule real-time sequencing and/or high-quality transcripts annotated in closely related species. `Well-annotation transcript sequence demo`_
+
+.. _Well-annotation transcript sequence demo: https://github.com/cma2015/CAFU/tree/master/Test_data/Transcripts
+ 
+* **De novo assembled transcripts**: Assembled transcript sequences generated from the function **Assemble Unmapped Reads**. `Assembled transcript demo`_
+
+.. _Assembled transcript demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/assembled_transcript.fasta
+
+.. class:: infomark
+
+**Outputs**
+
+* **Integrated GMAP results of newly assembled transcripts against all reference transcript sequences**: GMAP alignment results (coverage and identity) of each assembled transcript against all other transcript sequences.
+ 
+* **Confident transcript information**: Confident transcript information filtered by high coverage and identity.
+ 
+* **Confident transcript ID**: IDs of transcripts that prossess high similarity comparing to other well-annotated transcripts.
+ 
+.. class:: infomark
+
+**Parameters**
+
+* **Threads**: Number of threads to use (3 in default).
+
+* **Alignment identity threshold of a transcript**: Identity threshold with mapped transcripts (0.95 in default).
+
+* **Alignment coverage threshold of a transcript**: Coverage threshold with mapped transcripts (0.95 in default).
+
+.. class:: infomark
+
+**Citation**
+
+* Wu TD, Watanabe CK. GMAP: a genomic mapping and alignment program for mRNA and EST sequences. Bioinformatics 2005;21:1859-1875.
+ 
+    </help>
+ </tool>

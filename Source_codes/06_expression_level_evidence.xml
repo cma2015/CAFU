@@ -1,0 +1,114 @@
+<tool id="expression_level_evidence" name="Expression-level Evidence" version="17.09">
+	<description></description>
+	<requirement type="package" version="1.2.0">getopt</requirement>
+	<command>
+		mkdir $reference_file.files_path ;
+		cd $reference_file.files_path ;
+		/home/chenzhuod/galaxy/tools/CAFU/RSEM-1.3.1/rsem-prepare-reference --bowtie2 --bowtie2-path /home/chenzhuod/galaxy/tools/CAFU/bowtie2-2.3.4.3-linux-x86_64 -p 3 ${input_fasta} all_transcript > all_transcript.log;
+		
+		mkdir -p /home/chenzhuod/galaxy/database/files/Expression/expression_evidence/transBed ;
+		/home/chenzhuod/CAFU_python/bin/python /home/chenzhuod/galaxy/tools/CAFU/00_seq_len.py ${input_fasta} > /home/chenzhuod/galaxy/database/files/Expression/expression_evidence/allTrans_len ;
+		grep "Contig" /home/chenzhuod/galaxy/database/files/Expression/expression_evidence/allTrans_len > /home/chenzhuod/galaxy/database/files/Expression/expression_evidence/assembledTrans_len ;
+		
+		Rscript /home/chenzhuod/galaxy/tools/CAFU/05_createTransBed.R ;
+		sed -i 's/ //g' /home/chenzhuod/galaxy/database/files/Expression/expression_evidence/transBed/* ;
+		
+		#if $readtype.single_or_paired == "single-end"
+			bash /home/chenzhuod/galaxy/tools/CAFU/05_expression_level_evidence_SE.sh $output_se $reference_file.files_path/all_transcript ${thread};
+			Rscript /home/chenzhuod/galaxy/tools/CAFU/05_expression_level_evidence.R --input $output_se --input1 $exp_sample_percent --output $expressedTrans_ID ;
+			
+		#elif $readtype.single_or_paired == "paired-end"
+			bash /home/chenzhuod/galaxy/tools/CAFU/05_expression_level_evidence_PE.sh $output_pe $reference_file.files_path/all_transcript ${thread};
+			Rscript /home/chenzhuod/galaxy/tools/CAFU/05_expression_level_evidence.R --input $output_pe --input1 $exp_sample_percent --output $expressedTrans_ID ;
+		#end if
+		sed -i 's/"//g' $expressedTrans_ID ;
+		
+		bash /home/chenzhuod/galaxy/tools/CAFU/05_readCov.sh ;
+		Rscript /home/chenzhuod/galaxy/tools/CAFU/05_readCov.R --input $read_cov_percent --output1 $read_coverage --output2 $readCov_ID ;
+		
+		sort $expressedTrans_ID > /home/chenzhuod/galaxy/database/files/Expression/expression_evidence/expressedTrans_ID ;
+		sort $readCov_ID > /home/chenzhuod/galaxy/database/files/Expression/expression_evidence/readCov_ID ;
+		comm -12 /home/chenzhuod/galaxy/database/files/Expression/expression_evidence/expressedTrans_ID /home/chenzhuod/galaxy/database/files/Expression/expression_evidence/readCov_ID > $confidentTrans_ID ;
+		
+		rm -rf /home/chenzhuod/galaxy/database/files/Expression/expression_evidence/ ;
+	</command>
+	<inputs>
+		<param name="input_fasta" type="data" format="fasta" label="All transcript sequences" />		
+		<conditional name="readtype">
+			<param name="single_or_paired" type="select" label="Single-end or paired-end reads?">
+				<option value="single-end" selected="true">Single-end</option>
+				<option value="paired-end">Paired-end</option>
+			</param>		
+		</conditional>
+		
+		<param name="exp_sample_percent" type="float" value="0.1" label="Minimum percent of expressed transcript samples for a transcript" />
+		<param name="read_cov_percent" type="float" value="0.6" label="Maximum base percent of a transcript prossess 5× read coverage" />
+		
+		<param name="thread" type="integer" value="3" label="Threads"/>
+	</inputs>
+	<stdio>
+		<exit_code range="1:"  level="fatal" description="Error Running Expression-level Evidence" />
+	</stdio>
+	<outputs>
+		<data name="reference_file" hidden="TRUE" format="rsem_ref" label="RSEM all transcript reference"/>
+		<data name="read_coverage" format="txt" label="Read coverage of each transcript in each sample"/>
+		<data name="readCov_ID" format="txt" hidden="TRUE" label="Confident transcript ID filtered by read coverage results"/>
+		<data name="output_se" format="txt" label="Expression abundance of each transcript in each sample" >
+			<filter>readtype['single_or_paired'] == "single-end"</filter>
+		</data>
+		<data name="expressedTrans_ID" hidden="TRUE" format="txt" label="Confident transcript ID filtered by expression abundance" >
+			<filter>readtype['single_or_paired'] == "single-end"</filter>
+		</data>
+		<data name="output_pe" format="txt" label="Expression value of all transcripts" >
+			<filter>readtype['single_or_paired'] == "paired-end"</filter>
+		</data>
+		<data name="expressedTrans_ID" hidden="TRUE" format="txt" label="Confident transcript ID filtered by expression abundance" >
+			<filter>readtype['single_or_paired'] == "paired-end"</filter>
+		</data>
+		<data name="confidentTrans_ID" format="txt" label="Confident transcript ID by Expression-level Evidence"/>
+	</outputs>
+<help>
+.. class:: infomark
+
+**What it does**
+		  
+The function allows users to eliminate assembled transcripts with low read coverage and/or low expression abundance, which are likely assembly artifacts. RNA-Seq data used for the function **Assemble Unmapped Reads** are mapped with newly assembled transcripts or/and reference transcripts by using bowtie2 (Langmead *et al*., 2012). CAFU calculates the read coverage of transcripts at single-base resolution using BEDTools (Quinlan *et al*., 2010), and estimates the expression abundance of transcripts in terms of FPKM (Fragments Per Kilobase Million) using RSEM (Li *et al*., 2011). Assembled transcripts with low read coverage (e.g., less than 10) and low expression (e.g., FPKM less than 1) in the majority of samples (e.g., 80%) are discarded.
+
+.. class:: infomark
+
+**Inputs**
+
+* **All transcript sequences**: Transcripts sequences used for calculating read coverage and expression abundance (We recommend that users use transcripts which are combined assembled and reference transcripts).
+     
+.. class:: infomark
+
+**Outputs**
+
+* **Read coverage of each transcript in each sample**: A matrix whose rows represent transcripts, and columns represent read coverage.
+ 
+* **Expression abundance of each transcript in each sample**: A matrix whose rows represent transcripts, and columns represent expression abundance.
+  
+* **Confident transcript ID by Expression-level Evidence**: IDs of confident transcripts filtered by both read coverage results and expression abundance.
+
+.. class:: infomark
+
+**Parameters**
+
+* **Minimum percent of expressed transcript samples for a transcript**: A threshold of filtering confident transcripts according to proportion of the expressed sample (FPKM ≥ 1) number of a transcript  (0.1 in default).
+ 
+* **Maximum base percent of a transcript prossess 5× read coverage**: A threshold of filtering confident transcripts according to read coverage of a transcript (0.6 in default).
+ 
+* **Threads**: Number of threads to use (3 in default).
+
+.. class:: infomark
+
+**Citation**
+
+* Langmead B, Salzberg SL. Fast gapped-read alignment with Bowtie 2. Nat Methods 2012;9:357-359.
+ 
+* Li B, Dewey CN. RSEM: accurate transcript quantification from RNA-Seq data with or without a reference genome, BMC Bioinformatics 2011;12:323.
+
+* Quinlan AR, Hall IM. BEDTools: a flexible suite of utilities for comparing genomic features. Bioinformatics 2010;26:841-842.
+
+    </help>
+</tool>

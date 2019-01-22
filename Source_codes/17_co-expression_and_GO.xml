@@ -1,0 +1,147 @@
+<tool id="WGCNA and topGO" name="Co-expression and Gene Ontology Enrichment Analysis" version="17.09">
+  <description></description>
+  <command>
+	Rscript /home/chenzhuod/galaxy/tools/CAFU/15_co-expression_and_GO.R --input1 $input_1 --input2 $WGCNA.input_2 --input3 $WGCNA.input_3 --input4 $WGCNA.input_4 --input5 $WGCNA.input_5 --input6 $input_6	
+		--output1 $output_1 --output2 $output_2 --output3 $output_3 --output4 $output_4 --output5 $output_5;
+  </command>
+  <inputs>
+      <param name="input_1" type="data" label="Transcript expression abundance matrix" help="WGCNA recommend a data set consisting of more than 15 samples. Otherwise it might generate noisy for the network to be biologically meaningful."/>
+		<param name="input_6" type="select" value="Choose" label="Species">
+			<option value="alyrata_eg_gene">Arabidopsis_lyrata</option>
+			<option value="atauschii_eg_gene">Aegilops_tauschii</option>
+			<option value="athaliana_eg_gene">Arabidopsis_thaliana</option>
+			<option value="atrichopoda_eg_gene">Amborella_trichopoda</option>
+			<option value="bdistachyon_eg_gene">Brachypodium_distachyon</option>
+			<option value="bnapus_eg_gene">Brassica_napus</option>
+			<option value="boleracea_eg_gene">Brassica_oleracea</option>
+			<option value="brapa_eg_gene">Brassica_rapa</option>
+			<option value="bvulgaris_eg_gene">Beta_vulgaris</option>
+			<option value="ccapsularis_eg_gene">Corchorus_capsularis</option>
+			<option value="ccrispus_eg_gene">Chondrus_crispus</option>
+			<option value="cmerolae_eg_gene">Cyanidioschyzon_merolae</option>
+			<option value="creinhardtii_eg_gene">Chlamydomonas_reinhardtii</option>
+			<option value="csativus_eg_gene">Cucumis_sativus</option>
+			<option value="dcarota_eg_gene">Daucus_carota</option>
+			<option value="drotundata_eg_gene">Dioscorea_rotundata</option>
+			<option value="gmax_eg_gene">Glycine_max</option>
+			<option value="graimondii_eg_gene">Gossypium_raimondii</option>
+			<option value="gsulphuraria_eg_gene">Galdieria_sulphuraria</option>
+			<option value="hannuus_eg_gene">Helianthus_annuus</option>
+			<option value="hvulgare_eg_gene">Hordeum_vulgare</option>
+			<option value="langustifolius_eg_gene">Lupinus_angustifolius</option>
+			<option value="lperrieri_eg_gene">Leersia_perrieri</option>
+			<option value="macuminata_eg_gene">Musa_acuminata</option>
+			<option value="mesculenta_eg_gene">Manihot_esculenta</option>
+			<option value="mtruncatula_eg_gene">Medicago_truncatula</option>
+			<option value="nattenuata_eg_gene">Nicotiana_attenuata</option>
+			<option value="obarthii_eg_gene">Oryza_barthii</option>
+			<option value="obrachyantha_eg_gene">Oryza_brachyantha</option>
+			<option value="oglaberrima_eg_gene">Oryza_glaberrima</option>
+			<option value="oglumipatula_eg_gene">Oryza_glumipatula</option>
+			<option value="oindica_eg_gene">Oryza_sativa_Indica_Group</option>
+			<option value="olongistaminata_eg_gene">Oryza_longistaminata</option>
+			<option value="olucimarinus_eg_gene">Ostreococcus_lucimarinus</option>
+			<option value="omeridionalis_eg_gene">Oryza_meridionalis</option>
+			<option value="onivara_eg_gene">Oryza_nivara</option>
+			<option value="opunctata_eg_gene">Oryza_punctata</option>
+			<option value="orufipogon_eg_gene">Oryza_rufipogon</option>
+			<option value="osativa_eg_gene">Oryza_sativa_Japonica_Group</option>
+			<option value="ppatens_eg_gene">Physcomitrella_patens</option>
+			<option value="ppersica_eg_gene">Prunus_persica</option>
+			<option value="ptrichocarpa_eg_gene">Populus_trichocarpa</option>
+			<option value="pvulgaris_eg_gene">Phaseolus_vulgaris</option>
+			<option value="sbicolor_eg_gene">Sorghum_bicolor</option>
+			<option value="sitalica_eg_gene">Setaria_italica</option>
+			<option value="slycopersicum_eg_gene">Solanum_lycopersicum</option>
+			<option value="smoellendorffii_eg_gene">Selaginella_moellendorffii</option>
+			<option value="stuberosum_eg_gene">Solanum_tuberosum</option>
+			<option value="taestivum_eg_gene">Triticum_aestivum</option>
+			<option value="tcacao_eg_gene">Theobroma_cacao</option>
+			<option value="tdicoccoides_eg_gene">Triticum_dicoccoides</option>
+			<option value="tpratense_eg_gene">Trifolium_pratense</option>
+			<option value="turartu_eg_gene">Triticum_urartu</option>
+			<option value="vangularis_eg_gene">Vigna_angularis</option>
+			<option value="vradiata_eg_gene">Vigna_radiata</option>
+			<option value="vvinifera_eg_gene">Vitis_vinifera</option>
+			<option value="zmays_eg_gene">Zea_mays</option>
+		</param>
+      <section name="WGCNA" title="WGCNA parameters" expanded="True">
+		<param name="input_2" type="text" value="1" min="0" label="Coefficient of variation" />
+		<param name="input_3" type="text" label="Minimum number of expressed samples" />
+		<param name="input_4" type="text" value="GCC" label="Correlation coefficent type"/>
+		<param name="input_5" type="integer" value="3" label="Treads" />
+      </section>
+  </inputs>
+  	<stdio>
+		<regex match="Execution halted"
+			   source="both"
+			   level="fatal"
+			   description="Execution halted." />
+		<regex match="Error in"
+			   source="both"
+			   level="fatal"
+			   description="An undefined error occured, please check your intput carefully and contact your administrator." />
+		<regex match="Fatal error"
+			   source="both"
+			   level="fatal"
+			   description="An undefined error occured, please check your intput carefully and contact your administrator." />
+	</stdio>
+  <outputs>
+	  <data name="output_1" format="pdf" label="Dendrograms and module colors" />
+	  <data name="output_2" format="tabular" label="Edge File" />
+	  <data name="output_3" format="tabular" label="Node File" />
+	  <data name="output_4" format="tabular" label="Hub transcript ID" />
+	  <data name="output_5" format="tabular" label="GO results" />
+  </outputs>
+    	<help>
+.. class:: infomark
+
+**What it does**
+		  
+In this function, co-expression network and GO enrichment analysis are used to annotate transcripts using "WGCNA" and "topGO", respectively.
+
+.. class:: infomark
+
+**Inputs**
+
+* **Transcript expression abundance matrix**: Expression abundance matrix with the rows as transcripts and the columns as samples. (**NOTE** Transcript expression abundance matrix is not permitted to begin with a tab at the column name line (i.e., the first name)  `Differential expression transcript expression abundance matrix demo`_
+
+.. _Differential expression transcript expression abundance matrix demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/differentially_expressed_transcript_expression
+
+* Option **Species**: The species of genes in transcript expression abundance matrix.
+ 
+.. class:: infomark
+
+**Outputs**
+
+* **Dendrograms and module colors**: Plot of dendrograms and module colors.
+ 
+* **Edge File**: The edge results of co-expression network.
+ 
+* **Node File**: The node results of co-expression network.
+ 
+* **Hub transcript ID**: The hub transcript ID in each module of co-expression network.
+ 
+* **GO results**: GO enrichment results of each module.
+
+.. class:: infomark
+
+**Parameters**
+
+* **Coefficient of variation**: The threshold of coefficient of variation (1 in default).
+
+* **Minimum number of expressed samples**: The minimum number of expressed samples (FPKM ≥ 1) of a transcript.
+ 
+* **Correlation coefficent type**: A character string that specifies the correlation method to be used for correlation calculation, including "GCC", "PCC", "SCC", "KCC", "BiWt" ("GCC" in default).
+ 
+* **Threads**: Number of threads to use (3 in default).
+
+.. class:: infomark
+
+**Citation**
+
+* Alexa A, Rahnenfuhrer J. topGO: enrichment analysis for gene ontology. R package version 2010;2.
+
+* Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. BMC Bioinformatics 2008;9:559-571.
+    </help>
+</tool>

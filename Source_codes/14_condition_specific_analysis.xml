@@ -1,0 +1,58 @@
+<tool id="condiSpecAnalysis" name="Analyze Condition Specificity" version="17.09">
+	<description></description>
+	<requirement type="package" version="1.2.0">getopt</requirement>
+	<command>
+			sed -i 's/\"//g' $expMat ;
+			Rscript /home/chenzhuod/galaxy/tools/CAFU/12_condition_specific.R --input1 $expMat --input2 $sampleInfo --input3 $TSVal --output1 $output_1 --output2 $output_2 ; 
+	</command>
+	<inputs>
+				<param name="expMat" type="data" label="Transcript expression abundance matrix"/>
+				<param name="sampleInfo" type="data" label="RNA-Seq sample condition information"/>
+				<param name="TSVal" type="text" value="0.8" label="Condition-specific score" />
+	</inputs>
+	<stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Analyzing Condition Specificity" />
+    </stdio>
+	<outputs>
+		<data name="output_1" format="txt" label="Condition specific transcritp information" />
+		<data name="output_2" format="pdf" label="Expression heatmap of condition-specific transcripts" />
+	</outputs>
+	<help>
+.. class:: infomark
+
+**What it does**
+		  
+This function identifies a set of transcripts highly expressed under different conditions. The condition specificity of a transcript is defined using the formula described in (Ma *et al*., 2014).
+
+.. class:: infomark
+
+**Inputs**
+
+* **Transcript expression abundance matrix**: Expression abundance matrix with the rows as transcripts and the columns as samples. `Transcript expression abundance matrix demo`_
+
+.. _Transcript expression abundance matrix demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/assembled_transcript_expression
+ 
+* **RNA-Seq sample condition information**: A semicolon seperated matrix which contains two columns. The first column is experiment information. The second column is sample ID (multiple samples are seperated by comma). `RNA-Seq sample condition demo`_
+
+.. _RNA-Seq sample condition demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/RNA-Seq_sample_information
+
+.. class:: infomark
+
+**Outputs**
+
+* **Condition specific transcript information**: Information of condition-specific transcripts, including condition-specific transcript ID and corresponding specifically condition.
+
+* **Expression heatmap of condition-specific transcripts**: Digital plot of condition-specific transcript experssion.
+
+.. class:: infomark
+
+**Parameters**
+
+* **Condition-specific score**: A threshold of identifying condition-specific transcripts. For condition-specific scores of each transcript under each condition, the higher score of a transcript under one experimental condition, the more likely the transcript is to be specifically expressed under this experimental condition.
+
+**Citation**
+
+* Ma C, Xin M, Feldmann KA et al. Machine learning-based differential network analysis: a study of stress-responsive transcriptomes in Arabidopsis, Plant Cell 2014;26:520-537. 
+
+    </help>
+</tool>

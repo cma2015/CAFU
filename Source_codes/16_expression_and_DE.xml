@@ -1,0 +1,119 @@
+<tool id="expression_and_DE" name="Analyze Differential Expression" version="17.09">
+  <description>
+  </description>
+  <command>
+		mkdir $reference_file.files_path ;
+		cd $reference_file.files_path ;
+		/home/chenzhuod/galaxy/tools/CAFU/RSEM-1.3.1/rsem-prepare-reference --bowtie2 --bowtie2-path /home/chenzhuod/galaxy/tools/CAFU/bowtie2-2.3.4.3-linux-x86_64 -p 3 ${all_trans_sequence} all_transcripts > all_transcripts.log;
+
+		mkdir -p /home/chenzhuod/galaxy/database/files/Expression/DE_analysis/ ;
+		/home/chenzhuod/galaxy/tools/CAFU/RSEM-1.3.1/rsem-generate-ngvector ${all_trans_sequence} /home/chenzhuod/galaxy/database/files/Expression/DE_analysis/all_trans ;
+
+		cat $input_table > /home/chenzhuod/galaxy/database/files/Expression/DE_analysis/RNA-Seq_info ;
+		
+		echo -n "" > /home/chenzhuod/galaxy/database/files/Expression/DE_analysis/name;
+		#for t in $input_collection:
+			echo -n "$t.name " >> /home/chenzhuod/galaxy/database/files/Expression/DE_analysis/name; 
+			cat $t > /home/chenzhuod/galaxy/database/files/Expression/DE_analysis/"$t.name";
+		#end for
+
+		bash /home/chenzhuod/galaxy/tools/CAFU/14_expression_and_DE.sh $output $reference_file.files_path/all_transcripts $Trimmomatic.window_size $Trimmomatic.required_quality $Trimmomatic.minlen $Trimmomatic.leading $Trimmomatic.trailing $Trimmomatic.phred $DE_transcripts_ID $output_2 $DE.FDR $DE.fold_change;
+		
+		egrep -w -f ${DE_transcripts_ID} ${output_2} > ${output_3} ;
+		sed -i 's/"//g' ${output_3} ;
+	</command>
+  <inputs>
+		<param name="all_trans_sequence" type="data" format="fasta" label="All transcript sequences" />
+		<param name="input_table" type="data" label="RNA-Seq sample experiment information"/>
+		<param name="input_collection" type="data_collection" label="RNA-Seq data (as a collection)" />
+		
+		<section name="Trimmomatic" title="Trimming read parameters" expanded="True">
+			<param name="phred" type="integer" label="Quality scores" value="33" />
+			<param name="minlen" type="integer" label="Minimum length of reads to be kept" value="20" min="0" />
+			<param name="window_size" type="integer" label="The number of bases to average across (SLIDINGWINDOW)" value="4" />
+			<param name="required_quality" type="integer" label="The average quality required (SLIDINGWINDOW)" value="20" />
+			<param name="leading" type="integer" label="Minimum quality required to keep a base (LEADING)" value="20"/>
+			<param name="trailing" type="integer" label="Minimum quality required to keep a base (TRAILING)" value="20"/>
+		</section>
+		
+		<section name="DE" title="Differential expression parameters" expanded="True">
+			<param name="fold_change" type="float" label="Fold change" value="2.0" />
+			<param name="FDR" type="float" label="FDR-adjusted p-value" value="0.05" />			
+		</section>
+  </inputs>
+  <stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Running Analyze Differential Expression" />
+  </stdio>
+  <outputs>
+	  <data name="reference_file" hidden="TRUE" format="rsem_ref" label="RSEM all transcript reference"/>
+	  <data name="output" format="txt" label="Differential expression transcript information" />
+	  <data name="DE_transcripts_ID" format="txt" label="Differential expression transcript ID" />
+	  <data name="output_2" format="txt" hidden="TRUE" label="Expression value of all transcripts" />
+	  <data name="output_3" format="txt" label="Expression value of DE transcripts" />
+  </outputs>
+  	<help>
+.. class:: infomark
+
+**What it does**
+		  
+This function integrates RSEM (Li *et al*., 2011) and EBSeq (Leng *et al*., 2013) to identify differential expression transcripts.
+
+.. class:: infomark
+
+**Inputs**
+
+* **All transcript sequences**: Transcripts sequences used for calculating read coverage and expression abundance (We recommend that users use transcripts which are combined assembled and reference transcripts). `All transcript sequences demo`_
+
+.. _All transcript sequences demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/assembled_transcript.fasta
+ 
+* **RNA-Seq sample experiment information**: A semicolon seperated matrix which contains four columns. The first column is experiment information. The second column is ID of control samples (multiple samples are seperated by comma). The third column is ID of stress samples (multiple samples are seperated by comma). The forth column is sequencing information (SE (single-end) or PE (paired-end)). `Differential expression condition demo`_
+
+.. _Differential expression condition demo: https://github.com/cma2015/CAFU/blob/master/Test_data/SE%20RNA-Seq/DE_Info
+ 	
+* **RNA-Seq data (as a collection)**: RNA-Seq data corresponding with **RNA-Seq sample experiment information** (as a collection). `RNA-Seq demo`_
+
+.. _RNA-Seq demo: https://github.com/cma2015/CAFU/tree/master/Test_data/SE%20RNA-Seq
+
+.. class:: infomark
+
+**Outputs**
+
+* **Differential expression transcript information**: Information of differential expression transcripts filtered by user-defined criteria, including transcript ID, FDR, fold change, etc.
+ 
+* **Differential expression transcript ID**: IDs of differential expression transcripts filtered by differential expression criteria.
+
+* **Expression value of DE transcripts**: Expression abundance matrix of differential expression transcripts with the rows as transcripts and the columns as samples.
+ 
+.. class:: infomark
+
+**Parameters**
+
+For Trimming read parameters
+ 
+* **Quality scores**: RNA-Seq quality scores, phred33 or phread64 (33 in default).
+
+* **Minimum length of reads to be kept**: Minimum length of reads kept in trimming (20bp in default).
+
+* **The number of bases to average across (SLIDINGWINDOW)**: Specifies the number of bases to average across (4 in default).
+ 
+* **The average quality required (SLIDINGWINDOW)**: Specifies the average quality required (20 in default).
+
+* **Minimum quality required to keep a base (LEADING)**: Bases at the start of the read with quality below the threshold will be removed (20 in default).
+
+* **Minimum quality required to keep a base (TRAILING)**: Bases at the end of the read with quality below the threshold will be removed (20 in default).
+ 
+For Differential expression parameters
+ 
+* **Fold change**: The ratio of expression value between control and stress samples.
+ 
+* **FDR-adjusted p-value**: q-value.
+
+.. class:: infomark
+
+**Citation**
+ * Leng N, Dawson JA, Thomson JA et al. EBSeq: an empirical Bayes hierarchical model for inference in RNA-seq experiments. Bioinformatics 2013;29:1035-1043.
+ 
+ * Li B, Dewey CN. RSEM: accurate transcript quantification from RNA-Seq data with or without a reference genome. BMC Bioinformatics 2011;12:323-338.
+
+    </help>
+</tool>

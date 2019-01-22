@@ -1,0 +1,250 @@
+<tool id="SAT" name="Species Assignment of Transcripts" version="17.09">
+  <description> 
+  </description>
+  <command>
+	  mkdir -p /home/chenzhuod/galaxy/database/files/SAT ;
+	  
+	  cat $test.candidateFa > /home/chenzhuod/galaxy/database/files/SAT/test.fa ;
+	  
+	  #if $model.type == "default"
+		/home/chenzhuod/CAFU_python/bin/python /home/chenzhuod/galaxy/tools/CAFU/SAT/predict.py -candidates /home/chenzhuod/galaxy/database/files/SAT/test.fa 
+		
+		#if $model.pre_model.type == "wheat-PST"
+			-out /home/chenzhuod/galaxy/database/files/SAT/ ;
+		
+		#elif $model.pre_model.type == "upload"
+			-model $model.pre_model.pre_upload_model -out /home/chenzhuod/galaxy/database/files/SAT/ ;
+		
+		#end if
+		
+		cat /home/chenzhuod/galaxy/database/files/SAT/mixed_transcripts_predict.txt > $predictRes_d ;
+		
+	  #elif $model.type == "custom_a"
+		cat $model.training.posCdsFa > /home/chenzhuod/galaxy/database/files/SAT/positive_cds.fa ;
+		cat $model.training.negCdsFa > /home/chenzhuod/galaxy/database/files/SAT/negative_cds.fa ;
+		
+		/home/chenzhuod/CAFU_python/bin/python /home/chenzhuod/galaxy/tools/CAFU/SAT/gcForest_hexamer.py -positive /home/chenzhuod/galaxy/database/files/SAT/positive_cds.fa -negative /home/chenzhuod/galaxy/database/files/SAT/negative_cds.fa -out /home/chenzhuod/galaxy/database/files/SAT/ -t $model.parameters.cpu -k $model.parameters.KFold -threshold $model.parameters.cuf_off;
+		cat /home/chenzhuod/galaxy/database/files/SAT/gcForest.pkl > $model_a ;
+		cat /home/chenzhuod/galaxy/database/files/SAT/measures.pdf > $measures_a ;
+		cat /home/chenzhuod/galaxy/database/files/SAT/precision_recall.pdf > $precision_recall_a ;
+		cat /home/chenzhuod/galaxy/database/files/SAT/ROC.pdf > $ROC_a ;
+				
+		/home/chenzhuod/CAFU_python/bin/python /home/chenzhuod/galaxy/tools/CAFU/SAT/predict.py -candidates /home/chenzhuod/galaxy/database/files/SAT/test.fa -out /home/chenzhuod/galaxy/database/files/SAT/ -model $model_a ;
+		cat /home/chenzhuod/galaxy/database/files/SAT/mixed_transcripts_predict.txt > $predictRes_a ;
+		
+	  #elif $model.type == "custom_b"
+		cat $model.training.posCdsFa > /home/chenzhuod/galaxy/database/files/SAT/positive_cds.fa ;
+		cat $model.training.negCdsFa > /home/chenzhuod/galaxy/database/files/SAT/negative_cds.fa ;
+		cat $model.training.posBGFa > /home/chenzhuod/galaxy/database/files/SAT/positive_dna.fa ;
+		cat $model.training.negBGFa > /home/chenzhuod/galaxy/database/files/SAT/negative_dna.fa ;
+
+		/home/chenzhuod/CAFU_python/bin/python /home/chenzhuod/galaxy/tools/CAFU/SAT/gcForest_hexamer.py -positive /home/chenzhuod/galaxy/database/files/SAT/positive_cds.fa -negative /home/chenzhuod/galaxy/database/files/SAT/negative_cds.fa -out /home/chenzhuod/galaxy/database/files/SAT/ -posBG /home/chenzhuod/galaxy/database/files/SAT/positive_dna.fa -negBG /home/chenzhuod/galaxy/database/files/SAT/negative_dna.fa -t $model.parameters.cpu -k $model.parameters.KFold -threshold $model.parameters.cuf_off;
+		cat /home/chenzhuod/galaxy/database/files/SAT/gcForest.pkl > $model_b ;
+		cat /home/chenzhuod/galaxy/database/files/SAT/measures.pdf > $measures_b ;
+		cat /home/chenzhuod/galaxy/database/files/SAT/precision_recall.pdf > $precision_recall_b ;
+		cat /home/chenzhuod/galaxy/database/files/SAT/ROC.pdf > $ROC_b ;
+				
+		/home/chenzhuod/CAFU_python/bin/python /home/chenzhuod/galaxy/tools/CAFU/SAT/predict.py -candidates /home/chenzhuod/galaxy/database/files/SAT/test.fa -out /home/chenzhuod/galaxy/database/files/SAT/ -model $model_b ;
+		cat /home/chenzhuod/galaxy/database/files/SAT/mixed_transcripts_predict.txt > $predictRes_b ;
+		
+	  #end if
+	  
+	  rm -rf /home/chenzhuod/galaxy/database/files/SAT ;
+
+  </command>
+  <inputs>
+	  <conditional name="model">
+		<param name="type" type="select" label="Pre- or customized-trained model?">
+			<option value="default" selected="true">Pre-trained model</option>
+			<option value="custom_a">Customized-trained model without background sequences</option>			
+			<option value="custom_b">Customized-trained model with background sequences</option>			
+		</param>
+		<when value="default">
+			<conditional name="pre_model">
+				<param name="type" type="select" label="Pre-trained model type">
+					<option value="wheat-PST" selected="true">Pre-trained model provided by CAFU</option>
+					<option value="upload">Pre-trained model uploaded by users</option>						
+				</param>
+				<when value="wheat-PST">
+					<param name="model" type="select" value="Choose" label="Trained model provided by CAFU">
+						<option value="wheat_pst">Chinese Spring wheat - stripe rust pathogen model</option>
+					</param>
+				</when>
+				<when value="upload">
+					<param name="pre_upload_model" type="data" label="Trained model uploaded by users"/>
+				</when>
+			</conditional>	
+		</when>
+		<when value="custom_a">
+			<section name="training" title="Training sequences" expanded="True">
+				<param name="posCdsFa" type="data" label="Positive CDS sequences" />
+				<param name="negCdsFa" type="data" label="Negative CDS sequences" />
+			</section>
+			<section name="parameters" title="SAT parameters" expanded="True">
+				<param name="KFold" type="integer" value="10" label="K-fold" />
+				<param name="cpu" type="integer" value="3" min="1" label="Threads" />
+				<param name="cuf_off" type="float" value="0.5" min="0" max="1" label="Classifying threshold" />
+			</section>
+			
+		</when>
+		<when value="custom_b">
+			<section name="training" title="Training sequences" expanded="True">
+				<param name="posCdsFa" type="data" label="Positive CDS sequences" />
+				<param name="negCdsFa" type="data" label="Negative CDS sequences" />
+				<param name="posBGFa" type="data" label="Positive background sequences" />
+				<param name="negBGFa" type="data" label="Negative background sequences" />
+			</section>
+			<section name="parameters" title="SAT parameters" expanded="True">
+				<param name="KFold" type="integer" value="10" label="K-fold" />
+				<param name="cpu" type="integer" value="3" min="1" label="Threads" />
+				<param name="cuf_off" type="float" value="0.5" min="0" max="1" label="Classifying threshold" />
+			</section>
+			
+		</when>	    
+	  </conditional>
+	  <section name="test" title="Test sequences" expanded="True">
+		  <param name="candidateFa" type="data" label="Mixed CDS sequences" />
+	  </section>
+	  
+  </inputs>
+  <stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Running SAT" />
+  </stdio>
+  <outputs>
+	
+	<data name="predictRes_d" format="txt" label="Probabilistic score of each transcript">
+		<filter>model['type'] == "default"</filter>
+	</data>
+
+	<data name="model_a" label="Model">
+		<filter>model['type'] == "custom_a"</filter>
+	</data>
+	<data name="predictRes_a" format="txt" label="Probabilistic score of each transcript">
+		<filter>model['type'] == "custom_a"</filter>
+	</data>
+	<data name="measures_a" format="pdf" label="Eight commonly used measures under specified threshold">
+		<filter>model['type'] == "custom_a"</filter>
+	</data>
+	<data name="precision_recall_a" format="pdf" label="The presicion recall curves in k-fold cross validation">
+		<filter>model['type'] == "custom_a"</filter>
+	</data>
+	<data name="ROC_a" format="pdf" label="The receiver operating curves in k-fold cross validation">
+		<filter>model['type'] == "custom_a"</filter>
+	</data>
+	
+	<data name="model_b" label="Model">
+		<filter>model['type'] == "custom_b"</filter>
+	</data>
+	<data name="predictRes_b" format="txt" label="Probabilistic score of each transcript">
+		<filter>model['type'] == "custom_b"</filter>
+	</data>
+	<data name="measures_b" format="pdf" label="Eight commonly used measures under specified threshold">
+		<filter>model['type'] == "custom_b"</filter>
+	</data>
+	<data name="precision_recall_b" format="pdf" label="The presicion recall curves in k-fold cross validation">
+		<filter>model['type'] == "custom_b"</filter>
+	</data>
+	<data name="ROC_b" format="pdf" label="The receiver operating curves in k-fold cross validation">
+		<filter>model['type'] == "custom_b"</filter>
+	</data>
+	  
+  </outputs>
+    <help>
+.. class:: infomark
+
+**What it does**
+		  
+SAT (Species Assignment of Transcripts) is a machine learning-based toolkit used for species assignment of transcritps assembled using unmapped reads from mixed-species (e.g., pathogen-host) samples.
+
+.. class:: infomark
+
+**Inputs**
+
+* **Mixed CDS sequences**: The coding sequences (CDS) with FASTA format assembled using unmapped reads from mixed-species (e.g., pathogen-host). `The mixed CDS sequences demo`_
+
+.. _The mixed CDS sequences demo: https://github.com/cma2015/CAFU/blob/master/Test_data/SAT/test_cds.fa
+
+For selecting **Pre-trained model**
+
+(1) If selecting option **Pre-trained model provided by CAFU**
+
+* Option **Trained model provided by CAFU**: A pre-trained model to select. In the current version of CAFU, we provide a model trained by coding regions of 20,502 and 137,052 mRNAs annotated in the reference genome of stripe rust pathogen *Puccinia striiformis f. sp. tritici* (PST-78 v1) and Chinese Spring wheat (IWGSC RefSeq v1.0), respectively.
+
+(2) If selecting option **Pre-trained model uploaded by users**
+
+* **Trained model uploaded by users**: A pre-trained model to upload by users.
+
+* **Note**: Please upload a model file **without** any suffix.
+
+For selecting **Customized-trained model without background sequences**
+
+* **Positive CDS sequences**: Pathogen or host coding sequences (CDS) with FASTA format. `The positive CDS sequences demo`_
+
+.. _The positive CDS sequences demo: https://github.com/cma2015/CAFU/blob/master/Test_data/SAT/positive_cds.fa
+
+* **Negative CDS sequences**: Host or pathogen coding sequences (CDS) with FASTA format. `The negative CDS sequences demo`_
+
+.. _The negative CDS sequences demo: https://github.com/cma2015/CAFU/blob/master/Test_data/SAT/negative_cds.fa
+
+For selection **Customized-trained model with background sequences**
+
+* **Positive CDS sequences**: Pathogen or host coding sequences (CDS) with FASTA format. 
+
+* **Negative CDS sequences**: Host or pathogen coding sequences (CDS) with FASTA format.
+
+* **Positive background sequences**: The positive background sequences used for calculating hexamer usage bias with FASTA format. `The positive background sequences demo`_
+
+.. _The positive background sequences demo: https://github.com/cma2015/CAFU/blob/master/Test_data/SAT/positive_cds.fa_BG.fa
+
+* **Negative background sequences**: The negative background sequences used for calculating hexamer usage bias with FASTA format. `The negative background sequences demo`_
+
+.. _The negative background sequences demo: https://github.com/cma2015/CAFU/blob/master/Test_data/SAT/negative_cds.fa_BG.fa
+
+.. class:: infomark
+
+**Outputs**
+
+For selecting **Pre-trained model**
+
+* **Probabilistic score of each transcript**: Assigned probabilistic score of each transcript.
+
+For selecting **Customized-trained model without background sequences**
+
+* **Probabilistic score of each transcript**: Assigned probabilistic score of each transcript.
+
+* **Model**: The model trained by customized sequences.
+
+* **Eight commonly used measures under different threshold**: A bar plot evaluating the measures (Sn, Sp, Pr, Acc, MCC, Fscore, AUC and AUPR) under specified threshold.
+
+* **The presicion recall curves in k-fold cross validation**: The PR curve in k-fold cross-validation.
+
+* **The receiver operating curves in k-fold cross validation**: The ROC curve in k-fold cross-validation.
+
+For selecting **Customized-trained model with background sequences**
+
+* **Probabilistic score of each transcript**: Assigned probabilistic score of each transcript.
+
+* **Model**: The model trained by customized sequences.
+
+* **Eight commonly used measures under different threshold**: A bar plot evaluating the measures (Sn, Sp, Pr, Acc, MCC, Fscore, AUC and AUPR) under specified threshold.
+
+* **The presicion recall curves in k-fold cross validation**: The PR curve in k-fold cross-validation.
+
+* **The receiver operating curves in k-fold cross validation**: The ROC curve in k-fold cross-validation.
+
+.. class:: infomark
+
+**Parameters**
+
+For selecting **Customized-trained model without background sequences** and **Customized-trained model with background sequences**
+
+* **K-fold**: The k-fold cross validation (10 in default).
+
+* **Threads**: Number of threads to use (3 in default).
+
+* **Classifying threshold**: The threshold used for classifying transcripts (0.5 in default).
+
+   </help>
+
+</tool>
+

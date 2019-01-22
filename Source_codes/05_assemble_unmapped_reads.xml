@@ -1,0 +1,113 @@
+<tool id="unmapReadsAssembly" name="Assemble Unmapped Reads" version="17.09">
+ 	<description></description>
+  <command>
+	  
+	mkdir -p /home/chenzhuod/galaxy/database/files/Assembly/Trinity ;
+	
+	#if $inputs.paired_or_single == "paired":
+		/home/chenzhuod/galaxy/tools/CAFU/trinityrnaseq-2.2.0/Trinity --no_bowtie --seqType fq --no_version_check --left $left_input_fq --right $right_input_fq --CPU ${thread} --max_memory ${memory}G --output /home/chenzhuod/galaxy/database/files/Assembly/Trinity ;
+	#elif $inputs.paired_or_single == "single":
+		sed '1~4 s/$/\/1/g' $input_fq ;
+		/home/chenzhuod/galaxy/tools/CAFU/trinityrnaseq-2.2.0/Trinity --no_bowtie --seqType fq --no_version_check --single $input_fq --CPU ${thread} --max_memory ${memory}G --output /home/chenzhuod/galaxy/database/files/Assembly/Trinity ;
+	#end if
+	
+	/home/chenzhuod/galaxy/tools/CAFU/cdhit-master/cd-hit-est -i /home/chenzhuod/galaxy/database/files/Assembly/Trinity/Trinity.fasta -o /home/chenzhuod/galaxy/database/files/Assembly/cd_hit_Res -c ${CDHIT.identity} -n ${CDHIT.wordLength} -T 2 ;
+	/home/chenzhuod/galaxy/tools/CAFU/CAP3/cap3 /home/chenzhuod/galaxy/database/files/Assembly/cd_hit_Res -p ${CAP3.overlapidentity} -o ${CAP3.overlaplength} ;
+	
+	cat /home/chenzhuod/galaxy/database/files/Assembly/cd_hit_Res.cap.contigs > ${assemblyTranscripts} ;
+	
+	rm -rf /home/chenzhuod/galaxy/database/files/Assembly/Trinity/ ;
+	rm /home/chenzhuod/galaxy/database/files/Assembly/cd_hit_Res.cap.contigs ;
+	
+  </command>
+
+  <inputs>
+	  <conditional name="inputs">
+		<param name="paired_or_single" type="select" label="Single-end or paired-end reads?">
+			<option value="single" selected="true">Single-end</option>
+			<option value="paired">Paired-end</option>
+		</param>
+            <when value="single">
+                <param name="input_fq" type="data" label="Input FASTQ file" />
+            </when>
+			<when value="paired">
+				<param name="left_input_fq" type="data" label="Input FASTQ file (R1 of pair)" />
+				<param name="right_input_fq" type="data" label="Input FASTQ file (R2 of pair)" />
+			</when>
+	</conditional>
+	
+	<section name="CDHIT" title="CD-HIT-EST parameters" expanded="True">
+			<param name="identity" type="float" value="0.9"  label="Similarity threshold" min=".75" max="1.0"/>
+			<param name="wordLength" type="integer" value="8" label="Word size" min="4" max="10"/>
+	</section>
+	
+	<section name="CAP3" title="CAP3 parameters" expanded="True">
+			<param name="overlapidentity" type="integer" size="3" value="90" label="Overlap percent identity" help="Must be > 65. 90 by default"/>
+			<param name="overlaplength" type="integer" size="3" value="40" label="Overlap length" help="Must be > 15. 40 by default" />
+	</section>	
+	<param name="thread" type="integer" value="3" label="Threads"/>
+	<param name="memory" type="integer" value="1" label="Memory (G)"/>
+  </inputs>
+  <outputs>
+	  <data name="assemblyTranscripts" format="fasta" label="Unmapped reads de novo assembled transcripts"/>
+
+  </outputs>
+        <help>
+.. class:: infomark
+
+**What it does**
+		  
+In this function, three steps including *de novo* assembly of unmapped reads, reducing redundancy of transcript fragments and re-assembly transcript fragments are sequentially performed to assemble unmapped reads using Trinity (Grabherr *et al*., 2011), CD-HIT-EST (Li *et al*., 2006) and CAP3 (Huang *et al*., 1999), respectively.
+
+.. class:: infomark
+
+**Inputs**
+
+For single-end RNA-Seq data
+
+* **Input FASTQ file**: Unmapped reads generated from the function **Extract Unmapped Reads** or **Remove Contamination**.
+
+For paired-end RNA-Seq data
+
+* **Input FASTQ file (R1 of pair)**, **Input FASTQ file (R1 of pair)**: Unmapped reads generated from the function **Extract Unmapped Reads** or **Remove Contamination**.
+
+.. class:: infomark
+
+**Outputs**
+
+* Unmapped reads *de novo* assembled transcripts: *de novo* assembled transcripts using unmapped reads through *de novo* assembly of unmapped reads, reducing redundancy of transcript fragments and re-assembly transcript fragments.
+
+.. class:: infomark
+
+**Parameters**
+
+* **Threads**: Number of threads to use (3 in default).
+
+* **Memory**: Maximum memory to use by Triniry (1G in default).
+
+For CD-HIT-EST parameters
+ 
+* **Similarity threshold**: Sequence identity threshold (0.9 in default).
+ 
+* **Word size**: It is suggested to adjust word size in function of similarity threshold. 8,9 or 10  for threshold in [0.9;1.0] interval, 7 for [0.88;0.9], 6 for [0.85;0.88], 5 for [0.80;0.85], 4 for [0.75;0.8].
+
+For CAP3 parameters
+ 
+* **Specify overlap**: Overlap percent identity cutoff N > 65 (90 in default).
+ 
+* **Overlap length**: Overlap length cutoff > 15 (40 in default).
+
+.. class:: infomark
+
+**Citation**
+
+* Grabherr MG, Haas BJ, Yassour M et al. Full-length transcriptome assembly from RNA-Seq data without a reference genome. Nat Biotechnol 2011;29:644-652.
+
+* Li W, Godzik A. Cd-hit: a fast program for clustering and comparing large sets of protein or nucleotide sequences. Bioinformatics 2006;22:1658-1659.
+
+* Huang X, Madan A. CAP3: A DNA sequence assembly program. Genome Res 1999;9:868-877.
+
+    </help>
+  
+  
+</tool>

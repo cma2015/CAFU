@@ -1,0 +1,131 @@
+<tool id="extractSeq" name="Extract Sequences" version="17.09">
+  <description></description>
+  <command>
+	  #if $extract.type == "type1"
+		/home/chenzhuod/galaxy/tools/CAFU/seqtk/seqtk subseq $assemblyFasta $novelID > $novelFasta_1 ;
+	  #elif $extract.type == "type2"
+		/home/chenzhuod/galaxy/tools/CAFU/cufflinks-2.2.1.Linux_x86_64/gffread -w $referenceTranscripts_2 -g $genome $genomeAnnotation;
+	  #elif $extract.type == "type3"
+		/home/chenzhuod/galaxy/tools/CAFU/seqtk/seqtk subseq $assemblyFasta $novelID > $novelFasta_3 ;
+		/home/chenzhuod/galaxy/tools/CAFU/cufflinks-2.2.1.Linux_x86_64/gffread -w $referenceTranscripts_3 -g $genome $genomeAnnotation;
+		cat $novelFasta_3 $referenceTranscripts_3 > $allFasta;	  
+	  #end if
+  </command>
+  <inputs>
+		<conditional name="extract">
+			<param name="type" type="select" label="Ways of extracting sequences">
+				<option value="type1" >Extract user-defined transcript sequences according to sequence ID from a fasta file</option>
+				<option value="type2" >Extract reference transcript sequences according to GTF/GFF from reference genome sequences</option>
+				<option value="type3" selected="true">Build all transcripts (including user-defined and reference transcripts)</option>
+			</param>
+			<when value="type1">
+				<param name="assemblyFasta" type="data" format="fasta" label="De novo assembled transcripts"/>
+				<param name="novelID" type="data" label="User-defined transcript ID" />
+			</when>
+			<when value="type2">
+				<param name="genome" type="data" format="fasta" label="Reference genome sequences"/>
+				<param name="genomeAnnotation" type="data" label="Reference genome annotation" />
+			</when>
+			<when value="type3">
+				<param name="assemblyFasta" type="data" format="fasta" label="De novo assembled transcripts"/>
+				<param name="novelID" type="data" label="User-defined transcript ID" />
+				<param name="genome" type="data" format="fasta" label="Reference genome sequences"/>
+				<param name="genomeAnnotation" type="data" label="Reference genome annotation" />
+			</when>
+		</conditional>
+  </inputs>
+  <stdio>
+		<exit_code range="1:"  level="fatal" description="Error Running Extract Sequences" />
+  </stdio>
+  <outputs>
+		<data name="novelFasta_1" format="fasta" label="Sequences of user-defined transcripts">
+			<filter>extract['type'] == "type1"</filter>
+		</data>
+		
+		<data name="referenceTranscripts_2" format="fasta" label="Sequences of reference transcripts">
+			<filter>extract['type'] == "type2"</filter>
+		</data>
+		
+		<data name="novelFasta_3" format="fasta" hidden="TRUE" label="Sequences of User-defined transcripts">
+			<filter>extract['type'] == "type3"</filter>
+		</data>
+		<data name="referenceTranscripts_3" format="fasta" hidden="TRUE" label="Sequences of reference transcripts">
+			<filter>extract['type'] == "type3"</filter>
+		</data>
+		<data name="allFasta" format="fasta" label="Sequences of all transcripts">
+			<filter>extract['type'] == "type3"</filter>
+		</data>
+  </outputs>
+      	<help>
+.. class:: infomark
+
+**What it does**
+		  
+This function provides sub-functions to extract transcript sequences:
+
+* **Extract user-defined transcript sequences according to sequence ID from a fasta file**: This function can be used for extracting sub-sequences (e.g. novel transcripts) from a fasta file (e.g. assembled transcript sequences) according to user-defined transcript ID (e.g. novel transcript ID). 
+
+* **Extract reference transcript sequences according to GTF/GFF from reference genome sequences**: This function is used for extracting reference transcript sequences from reference genome sequences according to genome annotation file (GTF/GFF).
+
+* **Build all transcripts (including user-defined and reference transcripts)**: This function is used for extracting user-defined transcript sequences and reference transcripts, and combining them.
+
+.. class:: infomark
+
+**Inputs**
+
+For **Extract user-defined transcript sequences according to sequence ID from a fasta file**
+
+* **De novo assembled transcripts**: Assembled transcript sequences generated from the function **Assemble Unmapped Reads**. `Assembled transcript demo`_
+
+.. _Assembled transcript demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/assembled_transcript.fasta
+ 
+* **User-defined transcript ID**: IDs of user-defined transcripts.
+
+For **Extract reference transcript sequences according to GTF/GFF from reference genome sequences**
+ 
+* **Reference genome sequences**: Sequences of reference genome including all chromosome. `Reference genome sequences demo`_
+
+.. _Reference genome sequences demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Genomes/maize.fa.zip
+ 
+* **Reference genome annotation**: Corresponding reference genome annotation file with reference genome. `Reference genome annotation demo`_
+
+.. _Reference genome annotation demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Genomes/maize.gff3.zip
+
+For **Build all transcripts (including user-defined and reference transcripts)**: four inputs are required:
+
+* **De novo assembled transcripts**: Assembled transcript sequences generated from the function **Assemble Unmapped Reads**. `Assembled transcript demo`_
+
+.. _Assembled transcript demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/assembled_transcript.fasta
+ 
+* **User-defined transcript ID**: IDs of user-defined transcripts.
+
+* **Reference genome sequences**: Sequences of reference genome including all chromosome. `Reference genome sequences demo`_
+
+.. _Reference genome sequences demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Genomes/maize.fa.zip
+ 
+* **Reference genome annotation**: Corresponding reference genome annotation file with reference genome. `Reference genome annotation demo`_
+
+.. _Reference genome annotation demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Genomes/maize.gff3.zip
+
+.. class:: infomark
+
+**Outputs**
+
+For **Extract sub-sequences according to sequence ID from a fasta file**
+
+* **Sequences of user-defined transcripts**
+
+For **Extract transcripts according to GTF/GFF from reference genome sequences**
+ 
+* **Sequences of reference transcripts**
+
+For **Build all transcripts file (including novel and reference transcripts)**
+
+* **Sequences of user-defined transcripts**
+
+* **Sequences of reference transcripts**
+ 
+* **Sequences of all transcripts**
+
+    </help>
+</tool>

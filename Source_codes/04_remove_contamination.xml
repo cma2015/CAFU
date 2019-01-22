@@ -1,0 +1,192 @@
+<tool id="contRemove" name="Remove Contamination" version="17.09">
+	<description></description>
+	<command>
+		mkdir -p /home/chenzhuod/galaxy/database/files/remove_contamination/ ;
+		
+		#if $cond.type == "aa"
+		
+			mkdir -p /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads/ ;
+			cat $unmap_reads_se_de > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads/unmapped_reads.fastq ;
+			bash /home/chenzhuod/galaxy/tools/CAFU/04_remove_contamination.sh $Parameters.identity $Parameters.coverage ;
+			cat /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads/*_clean.fq > $SEClean_de ;
+			rm /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads/*_clean.fq ;
+		
+		#elif $cond.type == "bb"
+		
+			mkdir -p /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/ ;
+			mkdir -p /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/ ;
+
+			cat $unmap_reads_R1_de > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/unmapped_reads_R1.fastq ;
+			cat $unmap_reads_R2_de > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/unmapped_reads_R2.fastq ;
+
+			bash /home/chenzhuod/galaxy/tools/CAFU/04_remove_contamination_2.sh $Parameters.identity $Parameters.coverage ;
+
+			awk '{if(NR%4==1) print $0}' /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/*_clean.fq | sed 's/@//g' > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/R1_cleanRead_ID ;
+			awk '{if(NR%4==1) print $0}' /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/*_clean.fq | sed 's/@//g' > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/R2_cleanRead_ID ;
+
+			rm /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/*_clean.fq ;
+			rm /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/*_clean.fq ;			
+			
+			/home/chenzhuod/galaxy/tools/CAFU/seqtk/seqtk subseq /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/unmapped_reads_R1.fastq /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/R1_cleanRead_ID > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/R1_cleanRead.fastq;
+			/home/chenzhuod/galaxy/tools/CAFU/seqtk/seqtk subseq /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/unmapped_reads_R2.fastq /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/R2_cleanRead_ID > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/R2_cleanRead.fastq;
+
+			cat /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/R1_cleanRead.fastq > $PEClean_R1_de ;
+			cat /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/R2_cleanRead.fastq > $PEClean_R2_de ;	
+		
+		#elif $cond.type == "cc"
+		
+			cat $contGenome > /home/chenzhuod/galaxy/database/files/remove_contamination/cont_genome.fasta ;
+			bash /home/chenzhuod/galaxy/tools/CAFU/04_create_custom_database.sh contSeq ;
+			
+			mkdir -p /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads/ ;
+			cat $unmap_reads_se > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads/unmapped_reads.fastq ;
+			bash /home/chenzhuod/galaxy/tools/CAFU/04_NEW_remove_contamination.sh contSeq $Parameters.identity $Parameters.coverage ;
+
+			cat /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads/*_clean.fq > $SEClean ;
+			rm /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads/*_clean.fq ;
+			
+		#elif $cond.type == "dd"
+		
+			cat $contGenome > /home/chenzhuod/galaxy/database/files/remove_contamination/cont_genome.fasta ;
+			bash /home/chenzhuod/galaxy/tools/CAFU/04_create_custom_database.sh contSeq ;
+			
+			mkdir -p /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/ ;
+			mkdir -p /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/ ;
+
+			cat $unmap_reads_R1 > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/unmapped_reads_R1.fastq ;
+			cat $unmap_reads_R2 > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/unmapped_reads_R2.fastq ;
+
+			bash /home/chenzhuod/galaxy/tools/CAFU/04_NEW_remove_contamination_2.sh $Parameters.identity $Parameters.coverage ;
+
+			awk '{if(NR%4==1) print $0}' /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/*_clean.fq | sed 's/@//g' > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/R1_cleanRead_ID ;
+			awk '{if(NR%4==1) print $0}' /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/*_clean.fq | sed 's/@//g' > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/R2_cleanRead_ID ;
+
+			rm /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/*_clean.fq ;
+			rm /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/*_clean.fq ;	
+
+			/home/chenzhuod/galaxy/tools/CAFU/seqtk/seqtk subseq /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/unmapped_reads_R1.fastq /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/R1_cleanRead_ID > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/R1_cleanRead.fastq;
+			/home/chenzhuod/galaxy/tools/CAFU/seqtk/seqtk subseq /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/unmapped_reads_R2.fastq /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/R2_cleanRead_ID > /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/R2_cleanRead.fastq;
+
+			cat /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R1/R1_cleanRead.fastq > $PEClean_R1 ;
+			cat /home/chenzhuod/galaxy/database/files/remove_contamination/unmapped_reads_R2/R2_cleanRead.fastq > $PEClean_R2 ;	
+			
+		#end if
+		</command>
+	<inputs>
+		<conditional name="cond">
+			<param name="type" type="select" label="Type of contamination database and unmapped reads">
+				<option value="cc" selected="true">Customized contamination database and single-end unmapped reads</option>
+				<option value="dd" >Customized contamination database and paired-end unmapped reads</option>
+				<option value="aa" >Default contamination database and single-end unmapped reads</option>
+				<option value="bb" >Default contamination database and paired-end unmapped reads</option>
+			</param>
+			<when value="aa">
+				<param name="unmap_reads_se_de" type="data" label="All unmapped reads" />	
+			</when>
+			<when value="bb">
+				<param name="unmap_reads_R1_de" type="data" label="All unmapped reads (R1 of pair)" />
+				<param name="unmap_reads_R2_de" type="data" label="All unmapped reads (R2 of pair)" />
+			</when>
+			<when value="cc">
+				<param name="contGenome" type="data" label="Contamination reference genome sequences" />
+				<param name="unmap_reads_se" type="data" label="All unmapped reads" />				
+			</when>
+			<when value="dd">
+				<param name="contGenome" type="data" label="Contamination reference genome sequences" />
+				<param name="unmap_reads_R1" type="data" label="All unmapped reads (R1 of pair)" />
+				<param name="unmap_reads_R2" type="data" label="All unmapped reads (R2 of pair)" />
+			</when>
+		</conditional>
+		<section name="Parameters" title="Parameters" expanded="True">
+			<param name="identity" type="integer" value="95" label="Alignment identity threshold in percentage" help="Integer from 1-100 without %" />
+			<param name="coverage" type="integer" value="95" label="Alignment coverage threshold in percentage" help="Integer from 1-100 without %" />
+		</section>		
+	</inputs>
+	<stdio>
+		<exit_code range="1:"  level="fatal" description="Error Running Remove Contamination" />
+	</stdio>
+	<outputs>
+		<data name="SEClean_de" label="Clean_unmapped_reads.fastq" format="fastqsanger,fastqsanger.gz">
+			<filter>cond['type'] == "aa"</filter>
+		</data>	
+
+		<data name="PEClean_R1_de" label="Clean_unmapped_reads_R1.fastq" format="fastqsanger,fastqsanger.gz">
+			<filter>cond['type'] == "bb"</filter>
+		</data>
+		<data name="PEClean_R2_de" label="Clean_unmapped_reads_R2.fastq" format="fastqsanger,fastqsanger.gz">
+			<filter>cond['type'] == "bb"</filter>
+		</data>
+		
+		<data name="SEClean" label="Clean_unmapped_reads.fastq" format="fastqsanger,fastqsanger.gz">
+			<filter>cond['type'] == "cc"</filter>
+		</data>	
+		
+		<data name="PEClean_R1" label="Clean_unmapped_reads_R1.fastq" format="fastqsanger,fastqsanger.gz">
+			<filter>cond['type'] == "dd"</filter>
+		</data>
+		<data name="PEClean_R2" label="Clean_unmapped_reads_R2.fastq" format="fastqsanger,fastqsanger.gz">
+			<filter>cond['type'] == "dd"</filter>
+		</data>
+	</outputs>
+	<help>
+.. class:: infomark
+
+**What it does**
+
+As unmapped reads may result from contamination during sampling or RNA-Seq. In this function, potential contamination sequences are removed using Deconseq (Schmieder *et al*., 2011) with user-defined coverage and identity (e.g., 95) by aligning unmapped reads generated from the function **Extract Unmapped Reads** to a contamination database.
+
+In the current version of CAFU, users can submit a file of customized contamination reference genome sequences to CAFU to generate a contamination database. Besides, we also provide a default contamination database contains 3,529 bacterial and 81 viral reference genomes (downloaded from NCBI on 2018/11/05).
+
+.. class:: infomark
+
+**Inputs**
+
+For selecting **Customized contamination database and single-end unmapped reads**
+
+* **Contamination reference genome sequences**: A **regular** file of contamination reference genome sequences with FASTA format used for generating customized contamination database. `Contamination reference genome sequences demo`_
+
+.. _Contamination reference genome sequences demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/Cont_seq.fasta
+
+* **All unmapped reads**: Unmapped reads with FASTQ format which are generated from the function **Extract Unmapped Reads**.
+
+For selecting **Customized contamination database and paired-end unmapped reads**
+
+* **Contamination reference genome sequences**: A **regular** file of contamination reference genome sequences with FASTA format used for generating customized contamination database.
+
+* **All unmapped reads (R1 of pair)**, **All unmapped reads (R2 of pair)**: Unmapped reads with FASTQ format which are generated from the function **Extract Unmapped Reads**.
+
+For selecting **Default contamination database and single-end unmapped reads**
+
+* **All unmapped reads**: Unmapped reads with FASTQ format which are generated from the function **Extract Unmapped Reads**.
+
+For selecting **Default contamination database and paired-end unmapped reads**
+
+* **All unmapped reads (R1 of pair)**, **All unmapped reads (R2 of pair)**: Unmapped reads with FASTQ format which are generated from the function **Extract Unmapped Reads**.
+ 
+.. class:: infomark
+
+**Outputs**
+
+For single-end RNA-Seq
+
+* **Clean_unmapped_reads.fastq**: Clean unmapped reads which are removed contamination.
+
+For paired-end RNA-Seq
+
+* **Clean_unmapped_reads_R1.fastq**, **Clean_unmapped_reads_R2.fastq**: Clean unmapped reads which are removed contamination.
+ 
+.. class:: infomark
+
+**Parameters**
+
+* **Alignment identity threshold in percentage**: The identity threshold that unmapped reads are considered as contamination (95 in default). 
+ 
+* **Alignment coverage threshold in percentage**: The coverage threshold that unmapped reads are considered as contamination (95 in default). 
+
+.. class:: infomark
+
+**Citation**
+ * Schmieder R, Edwards R. Fast identification and removal of sequence contamination from genomic and metagenomic datasets, PLoS One 2011;6:e17288 
+
+    </help>
+</tool>

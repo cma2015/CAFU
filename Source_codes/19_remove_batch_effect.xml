@@ -1,0 +1,53 @@
+<tool id="remove_batch_effect" name="Remove Batch Effect" version="17.09">
+  <description></description>
+  <command>
+	  mkdir -p /home/chenzhuod/galaxy/database/files/batch_effect ;
+	  cat $expMat > /home/chenzhuod/galaxy/database/files/batch_effect/exp_matrix ;
+	  cat $sampleInfo > /home/chenzhuod/galaxy/database/files/batch_effect/sample_Info;
+	  
+	  Rscript /home/chenzhuod/galaxy/tools/CAFU/19_sva.R ;
+	  cat /home/chenzhuod/galaxy/database/files/batch_effect/corrExp > $corr_expMat ;
+  </command>
+  <inputs>
+      <param name="expMat" type="data" label="Transcript expression abundance matrix"/>
+      <param name="sampleInfo" type="data" label="Batch information" />
+  </inputs>
+  	  	<stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Running Remove Batch Effect" />
+    </stdio>
+  <outputs>
+	  <data name="corr_expMat" format="txt" label="Corrected transcript abundance matrix" />
+  </outputs>
+    	<help>
+.. class:: infomark
+
+**What it does**
+		  
+This function can be used to remove batch effect using an R package sva (Leek *et al*., 2012).
+
+.. class:: infomark
+
+**Inputs**
+
+* **Transcript expression abundance matrix**: Expression abundance matrix with the rows as transcripts and the columns as samples. `Transcript expression abundance matrix demo`_
+
+.. _Transcript expression abundance matrix demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/assembled_transcript_expression
+
+* **Batch information**: A semicolon seperated matrix which contains two columns. The first column is sample ID. The second column is experiment information. `Batch information demo`_
+
+.. _Batch information demo: https://github.com/cma2015/CAFU/blob/master/Test_data/Others/Batch_information.zip
+	 
+.. class:: infomark
+
+**Outputs**
+
+* **Corrected transcript abundance matrix**: Expression abundance matrix removed batch effect.
+ 
+.. class:: infomark
+
+**Citation**
+
+* Leek *et al*. The sva package for removing batch effects and other unwanted variation in high-throughput experiments. *Bioinformatics* 2012;28:882-883. 
+ 
+    </help>
+</tool>

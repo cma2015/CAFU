@@ -1,0 +1,66 @@
+<tool id="protein_level_evidence" name="Protein-level Evidence" version="17.09">
+  <description>
+  </description>
+  <command>
+		/home/chenzhuod/CAFU_python/bin/python /home/chenzhuod/galaxy/tools/CAFU/CPC2-beta/bin/CPC2.py -i $transcripts_sequence -o $CPCRes ;
+
+		awk '$2>=${CPC2.ORF_Len}{ print $0 }' $CPCRes | awk '$6>=${CPC2.CPC_score}{ print $1 }' | sed "1d" > $confiTrans_ID ;
+		/home/chenzhuod/galaxy/tools/CAFU/seqtk/seqtk subseq $transcripts_sequence $confiTrans_ID > $confiTrans_sequence ;
+		/usr/bin/perl /home/chenzhuod/galaxy/tools/CAFU/PfamScan/pfam_scan.pl -fasta $confiTrans_sequence -dir /home/chenzhuod/galaxy/tools/CAFU/PfamScan -clan_overlap -cpu ${thread} -translate all > $confiTrans_pfam_Result ;
+	</command>
+  <inputs>
+      <param name="transcripts_sequence" type="data" format="fasta" label="De novo assembled transcripts" />
+      <section name="CPC2" title="CPC2 parameters" expanded="True">		
+			<param name="CPC_score" type="float" value="0.5" min="0" label="Coding transcript score" />
+			<param name="ORF_Len" type="integer" value="100" min="0" label="Length of open reading frame (ORF)" />
+	  </section>
+	  <param name="thread" type="integer" value="3" label="Threads"/>
+  </inputs>
+  <stdio>
+	  <exit_code range="1:"  level="fatal" description="Error Running Protein-level Evidence" />
+	</stdio>
+  <outputs>
+	  <data name="CPCRes" format="txt" label="CPC2 results" />
+	  <data name="confiTrans_ID" format="txt" label="Confident transcript ID"/>
+	  <data name="confiTrans_sequence" hidden="TRUE" format="txt" label="Confident transcript sequences"/>
+	  <data name="confiTrans_pfam_Result" format="txt" label="Pfam results of confident assembly transcripts"/>
+  </outputs>
+          <help>
+.. class:: infomark
+
+**What it does**
+		  
+In this function, coding potential evidence of transcripts is fistly evaluated using CPC2 (Kang *et al*., 2017). Then for coding transcripts, Pfam (Finn *et al*., 2014) will be used to identify the protein families.
+
+.. class:: infomark
+
+**Inputs**
+ * **De novo assembled transcripts**: Assembled transcript sequences generated from the function **Assemble Unmapped Reads**.
+
+.. class:: infomark
+
+**Outputs**
+ * **CPC2 results**: A tab seperated CPC2 result matrix contains seven columns. Each column shows the assembled transcript ID, putative peptide length, Fickett score, isoelectric point, the integrity of the orf, coding probability and the coding/noncoding classification label. More details about this output can be seen from CPC2 official website (http://cpc2.cbi.pku.edu.cn/help.php). 
+ 
+ * **Confidence transcript ID**: IDs of transcripts that could be translated to protein.
+ 
+ * **Pfam results of confident assembly transcripts**: A tab seperated Pfam result matrix contains assembled transcript ID, alignment start, alignment end, envelope start, envelope end, Hmm access, Hmm name, Type of domain, Hmm start, Hmm end, Hmm length, Bit score, E-value, Significance, Clan, etc.
+
+.. class:: infomark
+
+**Parameters**
+ * **Coding transcript score**: A probabilistic score to filter coding transcripts. The higher the score is, the more probable being coding (0.5 in default).
+ 
+ * **Length of open reading frame (ORF)**: An ORF length threshold with coding transcripts (100 in default).
+ 
+ * **Threads**: Number of threads to use (3 in default).
+
+.. class:: infomark
+
+**Citation**
+ * Finn RD, Bateman A, Clements J et al. Pfam: the protein families database. Nucleic Acids Res 2014;42:D222-D230.
+ 
+ * Kang YJ, Yang DC, Kong L et al. CPC2: a fast and accurate coding potential calculator based on sequence intrinsic features. Nucleic Acids Res 2017;45:W12-W16.
+    </help>
+  
+</tool>
