@@ -10,18 +10,18 @@
 ![CAFU](https://github.com/cma2015/CAFU/blob/master/CAFU_images/Overview%20of%20CAFU.png)
 
 ## Overview of functional modules in CAFU
-- [**Extraction of unmapped reads**](https://github.com/cma2015/CAFU/blob/master/tutorial/Extraction_mapped_reads.md)
-- [***De novo* transcript assembly of unmapped reads**](https://github.com/cma2015/CAFU/blob/master/tutorial/De_novo_transcript_assembly_of_unmapped_reads.md)
-- [**Evidence support of assembled transcripts**](https://github.com/cma2015/CAFU/blob/master/tutorial/Evidence_support_of_assembled_transcripts.md)
-- [**Species assignment of assembled transcripts**](https://github.com/cma2015/CAFU/blob/master/tutorial/SAT.md)
-- [**Sequence characterization of assembled transcripts**](https://github.com/cma2015/CAFU/blob/master/tutorial/Sequence%20characterization%20of%20assembled%20transcripts.md)
-- [**Expression profiles of assembled transcripts**](https://github.com/cma2015/CAFU/blob/master/tutorial/Expression%20profiles%20of%20assembled%20transcripts.md)
-- [**Function annotation of assembled transcripts**](https://github.com/cma2015/CAFU/blob/master/tutorial/Function%20annotation%20of%20assembled%20transcripts.md)
+- [**Extraction of unmapped reads**](https://github.com/cma2015/CAFU/blob/master/Tutorials/Extraction_mapped_reads.md)
+- [***De novo* transcript assembly of unmapped reads**](https://github.com/cma2015/CAFU/blob/master/Tutorials/De_novo_transcript_assembly_of_unmapped_reads.md)
+- [**Evidence support of assembled transcripts**](https://github.com/cma2015/CAFU/blob/master/Tutorials/Evidence_support_of_assembled_transcripts.md)
+- [**Species assignment of assembled transcripts**](https://github.com/cma2015/CAFU/blob/master/Tutorials/SAT.md)
+- [**Sequence characterization of assembled transcripts**](https://github.com/cma2015/CAFU/blob/master/Tutorials/Sequence%20characterization%20of%20assembled%20transcripts.md)
+- [**Expression profiles of assembled transcripts**](https://github.com/cma2015/CAFU/blob/master/Tutorials/Expression%20profiles%20of%20assembled%20transcripts.md)
+- [**Function annotation of assembled transcripts**](https://github.com/cma2015/CAFU/blob/master/Tutorials/Function%20annotation%20of%20assembled%20transcripts.md)
 
 
 ## How to use CAFU
 
-- Tutorials for CAFU: https://github.com/cma2015/CAFU/blob/master/tutorial/User_manual.md
+- Tutorials for CAFU: https://github.com/cma2015/CAFU/blob/master/Tutorials/User_manual.md
 - Test datasets referred in the tutorials for CAFU: https://github.com/cma2015/CAFU/tree/master/test_data
 
 ## News and updates
