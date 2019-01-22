@@ -1,3 +1,4 @@
+
 <table>
     <tr>
         <td font-weight:bold>Functions</td>
@@ -43,4 +44,12 @@
         <td>BEDTools (version 2.27.0; http://bedtools.readthedocs.io/en/latest/)</td>
         <td>[6]</td>
     </tr>
+       <tr>
+        <td>Remove contamination</td>
+        <td>Remove contaminate unmapped reads</td>
+        <td>Unmapped reads (Fastq)</td>
+        <td>Clean unmapped reads (Fastq)</td>
+        <td>Deconseq (version 0.4.3 http://deconseq.sourceforge.net/)</td>
+        <td>[1]</td>
+   </tr> 
  </table>
