@@ -45,7 +45,7 @@
         <td>Quinlan <I>et al</I>., 2010</td>
     </tr>
        <tr>
-        <td>Remove contamination</td>
+        <td>Remove Contamination</td>
         <td>Remove contaminate unmapped reads</td>
         <td>Unmapped reads (Fastq)</td>
         <td>Clean unmapped reads (Fastq)</td>
