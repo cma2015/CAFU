@@ -7,7 +7,7 @@
 - Taking the advantages of machine learning (ML) technologies, CAFU also effectively addresses the challenge of classifying species-specific transcript assembled using unmapped reads from mixed-species samples. 
 - The CAFU project is hosted on GitHub(https://github.com/cma2015/CAFU) and can be accessed from http://bioinfo.nwafu.edu.cn:4001. The CAFU Docker image is available at https://hub.docker.com/r/malab/cafu.
 
-![CAFU](https://github.com/cma2015/CAFU/blob/master/Tutorials/CAFU_images/Overview_of_CAFU.png)
+    ![CAFU](https://github.com/cma2015/CAFU/blob/master/Tutorials/CAFU_images/Overview_of_CAFU.png)
 
 ## Overview of functional modules in CAFU
 - [**Extraction of unmapped reads**](https://github.com/cma2015/CAFU/blob/master/Tutorials/Extraction_mapped_reads.md)
@@ -22,7 +22,7 @@
 ## How to use CAFU
 
 - Tutorials for CAFU: https://github.com/cma2015/CAFU/blob/master/Tutorials/User_manual.md
-- Test datasets referred in the tutorials for CAFU: https://github.com/cma2015/CAFU/tree/master/test_data
+- Test datasets referred in the tutorials for CAFU: https://github.com/cma2015/CAFU/tree/master/Test_data
 
 ## News and updates
 
