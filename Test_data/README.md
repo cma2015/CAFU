@@ -1,6 +1,6 @@
 ### SE RNA-Seq
 - Eight single-end RNA-Seq datasets (SRR2144382.fastq.zip, SRR2144383.fastq.zip, SRR2144384.fastq.zip, SRR2144385.fastq.zip, SRR2144410.fastq.zip, SRR2144411.fastq.zip, SRR2144442.fastq.zip, SRR2144443.fastq.zip)
-- DE_Info: A semicolon seperated matrix containing used for identifying differential expression transcripts (DE_Info).
+- DE_Info: A semicolon seperated matrix containing used for identifying differential expression transcripts.
 - mapping_info: RNA-Seq information for aligning reads to reference genome.
 
 ### PE RNA-Seq
@@ -8,7 +8,7 @@
 - mapping_info: RNA-Seq information for aligning reads to reference genome.
 
 ### Genomes
-This folder includes three demo of reference genomes (maize.fa, Oryza.fa, Sorghum.fa) and an annotation of maize genomes (maize.gff3).
+This folder includes three demo of reference genomes (maize.fa.zip, Oryza.fa.zip, Sorghum.fa.zip) and an annotation of maize genomes (maize.gff3.zip).
 
 ### Transcripts
 This folder includes two well-annotated transcripts ("ref_trans.fasta", "ref_trans_1.fasta").
