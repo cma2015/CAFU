@@ -23,4 +23,12 @@
         <td>In-house scripts</td>
         <td>Our study</td>
 </tr>
+<tr>
+        <td>Detect alternative splicing events</td>
+        <td>Detect alternative splicing events in assembled transcripts</td>
+        <td>Alignment results (BAM); All transcript annotation file (GTF)</td>
+        <td>Alternative splicing events; Number of support reads</td>
+        <td>SGSeq (version 3.8; https://www.bioconductor.org/packages/release/bioc/html/SGSeq.html)</td>
+        <td>Goldstein <I>et al</I>., 2016</td>
+</tr>
 </table>
