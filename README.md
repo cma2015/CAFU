@@ -39,7 +39,7 @@
 
 ### CAFU released on Oct 13, 2018
 
-- CAFU source codes, web server and docker image were released for the first time.
+- CAFU source codes, web server and Docker image were released for the first time.
 
 
 ## How to access help
