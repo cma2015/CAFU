@@ -16,7 +16,7 @@ This folder includes two well-annotated transcripts ("ref_trans.fasta", "ref_tra
 ### SAT
 This folder includes four files of sequences (negative_cds.fa, negative_cds.fa_BG.fa, positive_cds.fa, positive_cds.fa_BG.fa, test_cds.fa).
 
-### others
+### Others
 This folder includes seven files (Assembled_transcript.fasta, Assembled_transcript_expression, AS_test.gtf, Cont_seq.fasta, Differentially_expressed_transcript_expression, RNA-Seq_sample_information).
 
 
