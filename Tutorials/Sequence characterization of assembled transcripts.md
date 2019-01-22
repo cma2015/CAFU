@@ -24,7 +24,7 @@
         <td>Our study</td>
 </tr>
 <tr>
-        <td>Detect alternative splicing events</td>
+        <td>Detect Alternative Splicing Events</td>
         <td>Detect alternative splicing events in assembled transcripts</td>
         <td>Alignment results (BAM); All transcript annotation file (GTF)</td>
         <td>Alternative splicing events; Number of support reads</td>
