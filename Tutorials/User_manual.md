@@ -316,6 +316,11 @@ In this module, we provide an example for each function to show how to perform u
   Then click **Execute** to run this function, then ```Probabilistic score of each transcript``` (a probabilistic score of each transcript, the higher, the more probable being positive.) will be returned (see figure below):
   
   ![SAT](./CAFU_images/Figure9.png)
+  
+  Besides, we also show the way which run SAT by training model using customized data. The test data are also in directory ```/your directory/CAFU/test_data/SAT/```.
+  
+  
+  
 
 ### SEQUENCE CHARACTERIZATION OF ASSEMBLED TRANSCRIPTS
 
