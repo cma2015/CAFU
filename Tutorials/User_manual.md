@@ -321,7 +321,7 @@ In this module, we provide an example for each function to show how to perform u
   
   ![SAT](./CAFU_images/Fig28.png)
   
-  Then click **Execute** to run this function, then ```Probabilistic score of each transcript``` (a probabilistic score of each transcript, the higher, the more probable being positive.), ```Model``` (The model trained by customized sequences.), ```Eight commonly used measures under different threshold``` (A bar plot evaluating the measures (Sn, Sp, Pr, Acc, MCC, Fscore, AUC and AUPR) under specified threshold.), ```The presicion recall curves in k-fold cross validation``` (The PR curve in k-fold cross-validation.), and ```The receiver operating curves in k-fold cross validation``` (The ROC curve in k-fold cross-validation.) will be returned (see figure below):
+  Then click **Execute** to run this function, then ```Probabilistic score of each transcript``` (a probabilistic score of each transcript, the higher, the more probable being positive), ```Model``` (a model trained by customized sequences), ```Eight commonly used measures under different threshold``` (a bar plot evaluating the measures (Sn, Sp, Pr, Acc, MCC, Fscore, AUC and AUPR) under specified threshold), ```The presicion recall curves in k-fold cross validation``` (a PR curve in k-fold cross-validation), and ```The receiver operating curves in k-fold cross validation``` (an ROC curve in k-fold cross-validation) will be returned (see figure below):
   
   ![SAT](./CAFU_images/Fig29.png)
 
