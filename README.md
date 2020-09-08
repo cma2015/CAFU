@@ -47,4 +47,4 @@
 * For any suggestions/comments, please send emails to: __Siyuan Chen__ <chenzhuod@gmail.com> or __Jingjing Zhai__ <zhaijingjing603@gmail.com> 
 
 ## How to cite this work
-Siyuan Chen, Chengzhi Ren, Jingjing Zhai, Jiantao Yu, Xuyang Zhao, Zelong Li, Ting Zhang, Wenlong Ma, Zhaoxue Han, Chuang Ma, CAFU: A Galaxy framework for exploring unmapped RNA-Seq data. Briefings in Bioinformatics, doi:10.1093/bib/bbz018.
+Siyuan Chen, Chengzhi Ren, Jingjing Zhai, Jiantao Yu, Xuyang Zhao, Zelong Li, Ting Zhang, Wenlong Ma, Zhaoxue Han, Chuang Ma. CAFU: a Galaxy framework for exploring unmapped RNA-Seq data. *Briefings in Bioinformatics*, 2020;**21**:676-686.
