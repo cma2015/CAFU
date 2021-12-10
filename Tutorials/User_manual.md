@@ -3,7 +3,7 @@
 
 
 ### CAFU Docker image installation
-- Step 1: [Docker installation](https:/github.com/cma2015/CAFU/blob/master/Tutorial/Docker_installation.md)
+- Step 1: [Docker installation](Docker_installation.md)
 - Step 2: CAFU installation from Docker Hub
   ```bash
   # Pull latest version of CAFU from Docker Hub
