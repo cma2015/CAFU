@@ -44,7 +44,6 @@
 
 ## How to access help
 * For any bugs/issues, please feel free to leave a message at Github [issues](<https://github.com/cma2015/CAFU/issues>). We will try our best to deal with all issues as soon as possible.
-* For any suggestions/comments, please send emails to: __Siyuan Chen__ <chenzhuod@gmail.com> or __Jingjing Zhai__ <zhaijingjing603@gmail.com> 
 
 ## How to cite this work
 Siyuan Chen, Chengzhi Ren, Jingjing Zhai, Jiantao Yu, Xuyang Zhao, Zelong Li, Ting Zhang, Wenlong Ma, Zhaoxue Han, Chuang Ma. CAFU: a Galaxy framework for exploring unmapped RNA-Seq data. *Briefings in Bioinformatics*, 2020;**21**:676-686.
